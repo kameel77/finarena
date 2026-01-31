@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  nextjs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Build-time variables (optional, can be overridden by Coolify ENV)
+        # These are embedded during build - changes require redeploy
+        - NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL:-https://finarena.pl}
+        - NEXT_PUBLIC_SITE_NAME=${NEXT_PUBLIC_SITE_NAME:-Finarena}
+    container_name: finarena-nextjs
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      # Runtime variables - these can be managed in Coolify UI
+      # Changes take effect immediately after container restart
+      - NODE_ENV=production
+      - GHOST_URL=${GHOST_URL}
+      - GHOST_CONTENT_API_KEY=${GHOST_CONTENT_API_KEY}
+      - NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL:-https://finarena.pl}
+      - NEXT_PUBLIC_SITE_NAME=${NEXT_PUBLIC_SITE_NAME:-Finarena}
+      - CONTACT_FORM_ENDPOINT=${CONTACT_FORM_ENDPOINT:-}
+    networks:
+      - finarena-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    # Optional: Run init script to check env vars
+    # Uncomment if you want to verify env vars before starting
+    # entrypoint: ["/bin/sh", "-c", "./scripts/check-env.sh && node server.js"]
+
+networks:
+  finarena-network:
+    driver: bridge
+    external: true

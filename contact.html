@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kontakt - Finarena</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="index.html" class="logo">
+                    <div class="logo-icon">F</div>
+                    <span>Finarena</span>
+                </a>
+                <button class="mobile-menu-toggle" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <ul class="nav-menu">
+                    <li><a href="index.html">Strona główna</a></li>
+                    <li><a href="services.html">Usługi</a></li>
+                    <li><a href="gallup-strengths.html">Mapy Kompetencji</a></li>
+                    <li><a href="contact.html" class="active">Kontakt</a></li>
+                </ul>
+                <a href="contact.html" class="btn btn-primary nav-cta">Rozpocznij współpracę</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="page-hero page-hero-small">
+            <div class="container">
+                <div class="page-hero-content">
+                    <span class="tag">Skontaktuj się z nami</span>
+                    <h1>Rozpocznij transformację swojej organizacji</h1>
+                    <p>Wypełnij formularz lub skontaktuj się bezpośrednio. Odpowiadamy w ciągu 24 godzin.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="contact-section">
+            <div class="container">
+                <div class="contact-layout">
+                    <div class="contact-info">
+                        <div class="contact-block">
+                            <h3>Dane kontaktowe</h3>
+                            <div class="contact-item">
+                                <span class="contact-icon">📧</span>
+                                <div>
+                                    <strong>Email</strong>
+                                    <a href="mailto:kontakt@finarena.pl">kontakt@finarena.pl</a>
+                                </div>
+                            </div>
+                            <div class="contact-item">
+                                <span class="contact-icon">📞</span>
+                                <div>
+                                    <strong>Telefon</strong>
+                                    <a href="tel:+48123456789">+48 123 456 789</a>
+                                </div>
+                            </div>
+                            <div class="contact-item">
+                                <span class="contact-icon">📍</span>
+                                <div>
+                                    <strong>Adres</strong>
+                                    <p>ul. Przykładowa 123<br>00-001 Warszawa, Polska</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="contact-block">
+                            <h3>Godziny pracy</h3>
+                            <div class="contact-item">
+                                <span class="contact-icon">🕐</span>
+                                <div>
+                                    <strong>Poniedziałek - Piątek</strong>
+                                    <p>9:00 - 17:00</p>
+                                </div>
+                            </div>
+                            <div class="contact-item">
+                                <span class="contact-icon">🕐</span>
+                                <div>
+                                    <strong>Sobota - Niedziela</strong>
+                                    <p>Zamknięte</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="contact-block">
+                            <h3>Śledź nas</h3>
+                            <div class="social-links-large">
+                                <a href="#" class="social-link">
+                                    <span>💼</span>
+                                    <span>LinkedIn</span>
+                                </a>
+                                <a href="#" class="social-link">
+                                    <span>🐦</span>
+                                    <span>Twitter</span>
+                                </a>
+                                <a href="#" class="social-link">
+                                    <span>📘</span>
+                                    <span>Facebook</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="contact-form-wrapper">
+                        <form class="contact-form" id="contactForm">
+                            <h2>Formularz kontaktowy</h2>
+                            <p>Wypełnij poniższy formularz, a nasz zespół skontaktuje się z Tobą w ciągu 24 godzin.</p>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="firstName">Imię *</label>
+                                    <input type="text" id="firstName" name="firstName" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="lastName">Nazwisko *</label>
+                                    <input type="text" id="lastName" name="lastName" required>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="email">Email *</label>
+                                    <input type="email" id="email" name="email" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="phone">Telefon</label>
+                                    <input type="tel" id="phone" name="phone">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="company">Nazwa firmy</label>
+                                <input type="text" id="company" name="company">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="service">Interesująca usługa *</label>
+                                <select id="service" name="service" required>
+                                    <option value="">Wybierz usługę...</option>
+                                    <option value="ai">Rozwiązania AI</option>
+                                    <option value="automation">Automatyzacja procesów</option>
+                                    <option value="mvp">POC/MVP Development</option>
+                                    <option value="leadership">Rozwój przywództwa</option>
+                                    <option value="gallup">Mapy kompetencji Gallup</option>
+                                    <option value="culture">Innowacje i kultura organizacyjna</option>
+                                    <option value="mentoring">Executive mentoring</option>
+                                    <option value="other">Inne / Nie wiem</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="message">Wiadomość *</label>
+                                <textarea id="message" name="message" rows="5" placeholder="Opisz swoje potrzeby lub zadaj pytanie..." required></textarea>
+                            </div>
+
+                            <div class="form-group checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="privacy" required>
+                                    <span class="checkmark"></span>
+                                    <span>Wyrażam zgodę na przetwarzanie moich danych osobowych zgodnie z <a href="#">polityką prywatności</a> *</span>
+                                </label>
+                            </div>
+
+                            <div class="form-group checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="marketing">
+                                    <span class="checkmark"></span>
+                                    <span>Chcę otrzymywać informacje o nowościach i ofertach (opcjonalnie)</span>
+                                </label>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-large btn-full">Wyślij wiadomość</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="map-section">
+            <div class="container">
+                <div class="map-placeholder">
+                    <div class="map-content">
+                        <span class="map-icon">🗺️</span>
+                        <p>Tutaj wyświetli się mapa z lokalizacją biura</p>
+                        <p class="map-note">W produkcyjnej wersji należy dodać iframe z Google Maps lub inną mapą</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="faq-contact">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Często zadawane pytania</h2>
+                </div>
+                
+                <div class="faq-grid">
+                    <div class="faq-card">
+                        <h4>Jak szybko odpowiadacie na zapytania?</h4>
+                        <p>Staramy się odpowiadać na wszystkie zapytania w ciągu 24 godzin w dni robocze. W przypadku złożonych projektów możemy potrzebować nieco więcej czasu na przygotowanie wstępnej wyceny.</p>
+                    </div>
+                    <div class="faq-card">
+                        <h4>Czy oferujecie bezpłatne konsultacje?</h4>
+                        <p>Tak, oferujemy bezpłatną, niezobowiązującą konsultację wstępną (30-45 minut), podczas której omawiamy potrzeby i przedstawiamy możliwe rozwiązania.</p>
+                    </div>
+                    <div class="faq-card">
+                        <h4>Czy pracujecie z firmami z całej Polski?</h4>
+                        <p>Tak, obsługujemy klientów z całej Polski oraz zagranicy. Spotkania mogą odbywać się online lub stacjonarnie - dostosowujemy się do preferencji klienta.</p>
+                    </div>
+                    <div class="faq-card">
+                        <h4>Jak długo trwają projekty?</h4>
+                        <p>Czas trwania zależy od zakresu projektu. Małe wdrożenia AI lub automatyzacji mogą trwać 2-4 tygodnie, podczas gdy kompleksowe programy transformacyjne mogą trwać 6-12 miesięcy.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="index.html" class="logo">
+                        <div class="logo-icon">F</div>
+                        <span>Finarena</span>
+                    </a>
+                    <p>Przyspieszamy rozwój firm przez połączenie technologii AI, automatyzacji procesów oraz rozwoju kompetencji i kultury organizacyjnej.</p>
+                    <div class="social-links">
+                        <a href="#" aria-label="LinkedIn">💼</a>
+                        <a href="#" aria-label="Twitter">🐦</a>
+                        <a href="#" aria-label="Facebook">📘</a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Usługi</h4>
+                        <ul>
+                            <li><a href="services.html#ai">Rozwiązania AI</a></li>
+                            <li><a href="services.html#automation">Automatyzacja</a></li>
+                            <li><a href="services.html#mvp">POC/MVP</a></li>
+                            <li><a href="gallup-strengths.html">Mapy Kompetencji</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Rozwój</h4>
+                        <ul>
+                            <li><a href="services.html#leadership">Przywództwo</a></li>
+                            <li><a href="services.html#culture">Kultura Innowacji</a></li>
+                            <li><a href="services.html#mentoring">Executive Mentoring</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Kontakt</h4>
+                        <ul>
+                            <li><a href="contact.html">Formularz kontaktowy</a></li>
+                            <li><a href="mailto:kontakt@finarena.pl">kontakt@finarena.pl</a></li>
+                            <li><a href="tel:+48123456789">+48 123 456 789</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Finarena. Wszelkie prawa zastrzeżone.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
