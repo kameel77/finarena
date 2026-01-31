@@ -1,43 +1,68 @@
-# Simple and stable Dockerfile for Next.js
-FROM node:18-alpine
-# Install system dependencies
-RUN apk add --no-cache libc6-compat wget
-# Set working directory
+# Base stage for shared configuration
+FROM node:18-alpine AS base
+
+# Stage 1: Install dependencies
+FROM base AS deps
+RUN apk add --no-cache libc6-compat
 WORKDIR /app
-# Copy package files first (for better caching)
-COPY package*.json ./
-# Install dependencies (npm install is more forgiving than npm ci)
+
+# Install dependencies based on the preferred package manager
+COPY package.json package-lock.json* ./
 RUN npm install
-# Copy all source files
+
+# Stage 2: Build the application
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-# Build arguments for environment variables
+
+# Set build-time environment variables
 ARG NEXT_PUBLIC_SITE_URL
 ARG NEXT_PUBLIC_SITE_NAME
 ARG GHOST_URL
 ARG GHOST_CONTENT_API_KEY
-# Set environment variables
-ENV NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL:-https://finarena.pl}
-ENV NEXT_PUBLIC_SITE_NAME=${NEXT_PUBLIC_SITE_NAME:-Finarena}
-ENV GHOST_URL=${GHOST_URL}
-ENV GHOST_CONTENT_API_KEY=${GHOST_CONTENT_API_KEY}
+
+ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
+ENV NEXT_PUBLIC_SITE_NAME=$NEXT_PUBLIC_SITE_NAME
+ENV GHOST_URL=$GHOST_URL
+ENV GHOST_CONTENT_API_KEY=$GHOST_CONTENT_API_KEY
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+
+RUN npm run build
+
+# Stage 3: Production runner
+FROM base AS runner
+WORKDIR /app
+
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-# Build the application
-RUN npm run build
-# Create non-root user for security
+
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
-# Change ownership of the app directory
-RUN chown -R nextjs:nodejs /app
-# Switch to non-root user
+
+# Copy essential files
+COPY --from=builder /app/public ./public
+
+# Set the correct permission for prerender cache
+RUN mkdir .next
+RUN chown nextjs:nodejs .next
+
+# Automatically leverage output traces to reduce image size
+# https://nextjs.org/docs/advanced-features/output-file-tracing
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
 USER nextjs
-# Expose port
+
 EXPOSE 3000
-# Set environment variables for runtime
+
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
-# Health check
+
+# Health check using wget (alpine has it)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
   CMD wget --quiet --tries=1 --spider http://localhost:3000/api/health || exit 1
-# Start the application (production mode)
-CMD ["npm", "start"]
+
+# Start the application using the standalone server
+CMD ["node", "server.js"]
