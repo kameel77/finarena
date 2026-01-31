@@ -48,9 +48,9 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            NEXT_PUBLIC_SITE_URL=${{ vars.NEXT_PUBLIC_SITE_URL }}
-            NEXT_PUBLIC_SITE_NAME=${{ vars.NEXT_PUBLIC_SITE_NAME }}
-            GHOST_URL=${{ vars.GHOST_URL }}
-            GHOST_CONTENT_API_KEY=${{ vars.GHOST_CONTENT_API_KEY }}
+            NEXT_PUBLIC_SITE_URL=${{ vars.NEXT_PUBLIC_SITE_URL || secrets.NEXT_PUBLIC_SITE_URL }}
+            NEXT_PUBLIC_SITE_NAME=${{ vars.NEXT_PUBLIC_SITE_NAME || secrets.NEXT_PUBLIC_SITE_NAME }}
+            GHOST_URL=${{ vars.GHOST_URL || secrets.GHOST_URL }}
+            GHOST_CONTENT_API_KEY=${{ secrets.GHOST_CONTENT_API_KEY }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
