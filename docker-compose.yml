@@ -2,14 +2,7 @@ version: '3.8'
 
 services:
   nextjs:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        - NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL:-https://finarena.pl}
-        - NEXT_PUBLIC_SITE_NAME=${NEXT_PUBLIC_SITE_NAME:-Finarena}
-        - GHOST_URL=${GHOST_URL}
-        - GHOST_CONTENT_API_KEY=${GHOST_CONTENT_API_KEY}
+    image: ghcr.io/kameel77/finarena:latest
     container_name: finarena-nextjs
     restart: unless-stopped
     ports:
