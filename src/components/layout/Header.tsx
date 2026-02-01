@@ -10,6 +10,7 @@ const navItems = [
   { href: '/', label: 'Strona główna' },
   { href: '/uslugi', label: 'Usługi' },
   { href: '/gallup', label: 'Mapy Kompetencji' },
+  { href: '/blog', label: 'Blog' },
   { href: '/kontakt', label: 'Kontakt' },
 ];
 
@@ -35,9 +36,8 @@ export function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`text-sm font-medium transition-colors hover:text-primary ${
-                  pathname === item.href ? 'text-primary' : 'text-text-secondary'
-                }`}
+                className={`text-sm font-medium transition-colors hover:text-primary ${pathname === item.href ? 'text-primary' : 'text-text-secondary'
+                  }`}
               >
                 {item.label}
               </Link>
@@ -78,9 +78,8 @@ export function Header() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`block text-sm font-medium transition-colors hover:text-primary ${
-                      pathname === item.href ? 'text-primary' : 'text-text-secondary'
-                    }`}
+                    className={`block text-sm font-medium transition-colors hover:text-primary ${pathname === item.href ? 'text-primary' : 'text-text-secondary'
+                      }`}
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {item.label}
