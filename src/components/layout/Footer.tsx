@@ -1,17 +1,18 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Linkedin, Twitter, Facebook, Mail, Phone, MapPin } from 'lucide-react';
 
 const footerLinks = {
   services: [
-    { href: '/uslugi#ai', label: 'Rozwiązania AI' },
-    { href: '/uslugi#automation', label: 'Automatyzacja' },
-    { href: '/uslugi#mvp', label: 'POC/MVP' },
-    { href: '/gallup', label: 'Mapy Kompetencji' },
+    { href: '/uslugi/ai', label: 'Rozwiązania AI' },
+    { href: '/uslugi/automatyzacje', label: 'Automatyzacja' },
+    { href: '/uslugi/mvp', label: 'POC/MVP' },
+    { href: '/uslugi/gallup-mapy-kompetencji', label: 'Mapy Kompetencji' },
   ],
   development: [
-    { href: '/uslugi#leadership', label: 'Przywództwo' },
-    { href: '/uslugi#culture', label: 'Kultura Innowacji' },
-    { href: '/uslugi#mentoring', label: 'Executive Mentoring' },
+    { href: '/uslugi/rozwoj-przywodztwa', label: 'Przywództwo' },
+    { href: '/uslugi/innowacje-kultura-organizacji', label: 'Kultura Innowacji' },
+    { href: '/uslugi/mentoring', label: 'Executive Mentoring' },
   ],
   company: [
     { href: '/kontakt', label: 'Kontakt' },
@@ -27,11 +28,8 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Brand */}
           <div className="lg:col-span-1">
-            <Link href="/" className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary-dark rounded-lg flex items-center justify-center text-white font-bold text-xl">
-                F
-              </div>
-              <span className="text-xl font-bold">Finarena</span>
+            <Link href="/" className="flex items-center mb-6 max-w-[160px]">
+              <Image src="/images/finarena-logo.svg" alt="Finarena Logo" width={200} height={40} className="w-full h-auto brightness-0 invert" />
             </Link>
             <p className="text-gray-400 text-sm mb-6">
               Przyspieszamy rozwój firm przez połączenie technologii AI, automatyzacji procesów oraz rozwoju kompetencji i kultury organizacyjnej.

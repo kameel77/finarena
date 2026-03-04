@@ -9,38 +9,38 @@ const services = [
     icon: Bot,
     title: 'Rozwiązania AI',
     description: 'Wdrażamy zaawansowane rozwiązania oparte o sztuczną inteligencję, które transformują sposób działania Twojej firmy.',
-    href: '/uslugi#ai',
+    href: '/uslugi/ai',
   },
   {
     icon: Settings,
     title: 'Automatyzacja Procesów',
     description: 'Optymalizujemy i automatyzujemy procesy biznesowe, eliminując zbędne działania i zwiększając efektywność.',
-    href: '/uslugi#automation',
+    href: '/uslugi/automatyzacje',
   },
   {
     icon: Code2,
     title: 'POC/MVP Development',
     description: 'Tworzymy prototypy i minimalne wersje produktów, które pozwalają szybko zweryfikować pomysły biznesowe.',
-    href: '/uslugi#mvp',
+    href: '/uslugi/mvp',
   },
   {
     icon: Target,
     title: 'Rozwój Przywództwa',
     description: 'Budujemy kompetencje liderskie w zespołach, wspierając transformację menedżerów w inspirujących liderów.',
-    href: '/uslugi#leadership',
+    href: '/uslugi/rozwoj-przywodztwa',
   },
   {
     icon: BarChart3,
     title: 'Mapy Kompetencji Gallup',
     description: 'Tworzymy szczegółowe mapy kompetencji oparte o Gallup Strengths, optymalizując skład zespołów i rozwój talentów.',
-    href: '/gallup',
+    href: '/uslugi/gallup-mapy-kompetencji',
     featured: true,
   },
   {
     icon: Lightbulb,
     title: 'Innowacje i Kultura',
     description: 'Wdrażamy kulturę innowacyjności i odpowiedzialności, która napędza wzrost i zaangażowanie pracowników.',
-    href: '/uslugi#culture',
+    href: '/uslugi/innowacje-kultura-organizacji',
   },
 ];
 
@@ -74,11 +74,10 @@ export function ServicesSection() {
             >
               <Link
                 href={service.href}
-                className={`block h-full p-8 rounded-xl border transition-all hover:shadow-lg hover:-translate-y-1 ${
-                  service.featured
-                    ? 'bg-gradient-to-br from-primary to-primary-dark text-white border-primary'
-                    : 'bg-background-secondary border-border hover:border-primary'
-                }`}
+                className={`block h-full p-8 rounded-xl border transition-all hover:shadow-lg hover:-translate-y-1 ${service.featured
+                  ? 'bg-gradient-to-br from-primary to-primary-dark text-white border-primary'
+                  : 'bg-background-secondary border-border hover:border-primary'
+                  }`}
               >
                 {service.featured && (
                   <span className="inline-block px-3 py-1 bg-white/20 text-white text-xs font-semibold rounded-full mb-4">
@@ -92,9 +91,8 @@ export function ServicesSection() {
                 <p className={`text-sm mb-4 ${service.featured ? 'text-white/90' : 'text-text-secondary'}`}>
                   {service.description}
                 </p>
-                <span className={`inline-flex items-center text-sm font-medium ${
-                  service.featured ? 'text-white' : 'text-primary'
-                }`}>
+                <span className={`inline-flex items-center text-sm font-medium ${service.featured ? 'text-white' : 'text-primary'
+                  }`}>
                   Dowiedz się więcej
                   <ArrowRight className="ml-1 w-4 h-4" />
                 </span>

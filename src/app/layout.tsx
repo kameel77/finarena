@@ -21,6 +21,9 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/',
   },
+  icons: {
+    icon: '/images/finarena.svg',
+  },
   openGraph: {
     type: 'website',
     locale: 'pl_PL',
