@@ -39,7 +39,7 @@ export function HeroSection() {
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Link>
               <Link
-                href="/uslugi"
+                href="/#uslugi"
                 className="inline-flex items-center justify-center px-6 py-3 border-2 border-border text-text-primary rounded-lg font-medium hover:border-primary hover:text-primary transition-colors"
               >
                 Poznaj nasze usługi

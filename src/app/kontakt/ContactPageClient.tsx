@@ -205,6 +205,7 @@ export function ContactPageClient() {
                     <input 
                       type="text" 
                       id="firstName" 
+                      name="firstName"
                       required
                       className="w-full px-4 py-3 rounded-xl bg-background border border-border focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
                       placeholder="Jan"
@@ -215,6 +216,7 @@ export function ContactPageClient() {
                     <input 
                       type="text" 
                       id="lastName" 
+                      name="lastName"
                       required
                       className="w-full px-4 py-3 rounded-xl bg-background border border-border focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
                       placeholder="Kowalski"
@@ -228,6 +230,7 @@ export function ContactPageClient() {
                     <input 
                       type="email" 
                       id="email" 
+                      name="email"
                       required
                       className="w-full px-4 py-3 rounded-xl bg-background border border-border focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
                       placeholder="jan.kowalski@firma.pl"
@@ -238,6 +241,7 @@ export function ContactPageClient() {
                     <input 
                       type="tel" 
                       id="phone" 
+                      name="phone"
                       className="w-full px-4 py-3 rounded-xl bg-background border border-border focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
                       placeholder="+48 000 000 000"
                     />
@@ -248,10 +252,12 @@ export function ContactPageClient() {
                   <label htmlFor="service" className="text-sm font-medium text-text-primary">Interesujący Cię obszar *</label>
                   <select 
                     id="service" 
+                    name="service"
+                    defaultValue=""
                     required
                     className="w-full px-4 py-3 rounded-xl bg-background border border-border focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none appearance-none cursor-pointer"
                   >
-                    <option value="" disabled selected>Wybierz specjalizację...</option>
+                    <option value="" disabled>Wybierz specjalizację...</option>
                     <option value="ai">Wdrożenia i strategie AI</option>
                     <option value="automation">Automatyzacja procesów (RPA)</option>
                     <option value="mvp">Development aplikacji (MVP)</option>
@@ -265,6 +271,7 @@ export function ContactPageClient() {
                   <label htmlFor="message" className="text-sm font-medium text-text-primary">Twoja wiadomość *</label>
                   <textarea 
                     id="message" 
+                    name="message"
                     rows={4}
                     required
                     className="w-full px-4 py-3 rounded-xl bg-background border border-border focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none resize-none"

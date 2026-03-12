@@ -51,7 +51,7 @@ export function ApproachSection() {
             </ul>
 
             <Link
-              href="/uslugi"
+              href="/#uslugi"
               className="inline-flex items-center px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition-colors"
             >
               Poznaj szczegóły

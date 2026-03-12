@@ -29,7 +29,7 @@ export function CTASection() {
               <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
             <Link
-              href="/uslugi"
+              href="/#uslugi"
               className="inline-flex items-center justify-center px-8 py-4 border-2 border-white text-white rounded-lg font-semibold hover:bg-white hover:text-primary transition-colors"
             >
               Przeglądaj usługi
