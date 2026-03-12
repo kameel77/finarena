@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { HeroSection } from '@/components/sections/HeroSection';
-// import { ClientsSection } from '@/components/sections/ClientsSection'; // TODO: Uncomment when real client data is available
+// import { ClientsSection } from '@/components/sections/ClientsSection';
+import { ClientsSection } from '@/components/sections/ClientsSection';
 import { ServicesSection } from '@/components/sections/ServicesSection';
 import { ApproachSection } from '@/components/sections/ApproachSection';
 import { ProgramsSection } from '@/components/sections/ProgramsSection';
@@ -17,11 +18,11 @@ export default function HomePage() {
   return (
     <>
       <HeroSection />
-      {/* <ClientsSection /> */} {/* TODO: Uncomment when real client data is available */}
       <ServicesSection />
       <ApproachSection />
       <ProgramsSection />
       <StatsSection />
+      <ClientsSection />
       {/* <TestimonialsSection /> */} {/* TODO: Uncomment when real testimonials are available */}
       <CTASection />
     </>

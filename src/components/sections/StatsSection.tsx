@@ -3,10 +3,10 @@
 import { motion } from 'framer-motion';
 
 const stats = [
-  { value: '150+', label: 'Wdrożonych projektów AI' },
-  { value: '50+', label: 'Zadowolonych klientów' },
-  { value: '500+', label: 'Przeprowadzonych audytów Gallup' },
-  { value: '98%', label: 'Poziom rekomendacji' },
+  { value: '30+', label: 'Wdrożonych MVP i automatyzacji' },
+  { value: '5', label: 'Strategii i audytów kultury organizacji' },
+  { value: '420+', label: 'Przeprowadzonych sesji CliftonStrengths (Gallup) 1:1' },
+  { value: '20+', label: 'Map kompetencji i matryc talentów zespołów' },
 ];
 
 export function StatsSection() {

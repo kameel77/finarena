@@ -164,7 +164,7 @@ export default function GallupMapyKompetencjiPage() {
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
                         <div className="max-w-3xl">
                             <h1 className="text-4xl lg:text-5xl font-bold text-text-primary leading-tight mb-6 mt-4">
-                                Gallup Mapy Kompetencji — strategiczny LP dla firm, które chcą rosnąć bez chaosu.
+                                Gallup Mapy Kompetencji<br />strategiczny LP dla firm, które chcą rosnąć bez chaosu.
                             </h1>
                             <p className="text-lg text-text-secondary mb-8 leading-relaxed max-w-2xl">
                                 To nie jest kolejny „miękki warsztat”. To proces, który łączy talenty ludzi z celami biznesowymi firmy: wynikiem, odpowiedzialnością, jakością współpracy i skutecznością liderów.

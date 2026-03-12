@@ -88,12 +88,12 @@ export function Footer() {
               <li>
                 <a href="tel:+48123456789" className="text-gray-400 hover:text-white transition-colors text-sm flex items-center gap-2">
                   <Phone className="w-4 h-4" />
-                  +48 123 456 789
+                  +48 502 358 645
                 </a>
               </li>
               <li className="text-gray-400 text-sm flex items-start gap-2">
                 <MapPin className="w-4 h-4 mt-0.5" />
-                <span>ul. Przykładowa 123<br />00-001 Warszawa</span>
+                <span>ul. Alternatywy 7 lok. 135<br />02-775 Warszawa</span>
               </li>
             </ul>
           </div>
