@@ -77,6 +77,7 @@ export function Header() {
                   href={item.href || '#'}
                   className={`text-sm font-medium transition-colors hover:text-primary ${pathname === item.href ? 'text-primary' : 'text-text-secondary'
                     }`}
+                  prefetch={item.href ? undefined : false} 
                 >
                   {item.label}
                 </Link>
