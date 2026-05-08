@@ -20,7 +20,7 @@ const navItems = [
   { href: '/', label: 'Strona główna' },
   { label: 'Usługi', children: serviceItems },
   { href: '/uslugi/gallup-mapy-kompetencji', label: 'Mapy Kompetencji' },
-  { href: '/blog', label: 'Blog' },
+  { href: 'https://diversi.pl', label: 'Blog' },
   { href: '/kontakt', label: 'Kontakt' },
 ];
 
