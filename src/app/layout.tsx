@@ -5,8 +5,22 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { generateOrganizationSchema, generateWebSiteSchema } from '@/lib/schema';
 
-const sans = Instrument_Sans({ subsets: ['latin', 'latin-ext'], variable: '--font-sans', display: 'swap' });
-const serif = Instrument_Serif({ subsets: ['latin'], weight: '400', style: ['normal', 'italic'], variable: '--font-serif', display: 'swap' });
+const sans = Instrument_Sans({
+  subsets: ['latin', 'latin-ext'],
+  variable: '--font-sans',
+  display: 'swap',
+  adjustFontFallback: false,
+  fallback: ['system-ui', '-apple-system', 'Segoe UI', 'Helvetica Neue', 'Arial', 'sans-serif'],
+});
+const serif = Instrument_Serif({
+  subsets: ['latin'],
+  weight: '400',
+  style: ['normal', 'italic'],
+  variable: '--font-serif',
+  display: 'swap',
+  adjustFontFallback: false,
+  fallback: ['Iowan Old Style', 'Palatino', 'Georgia', 'Times New Roman', 'serif'],
+});
 const mono = JetBrains_Mono({ subsets: ['latin'], weight: ['400', '500'], variable: '--font-mono', display: 'swap' });
 
 const DESC =
