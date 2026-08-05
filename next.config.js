@@ -1,5 +1,17 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async redirects() {
+    return [
+      { source: '/uslugi', destination: '/build', permanent: true },
+      { source: '/uslugi/ai', destination: '/build#ai', permanent: true },
+      { source: '/uslugi/automatyzacje', destination: '/build#automatyzacja', permanent: true },
+      { source: '/uslugi/mvp', destination: '/build#scale', permanent: true },
+      { source: '/uslugi/mentoring', destination: '/leadership#mentoring', permanent: true },
+      { source: '/uslugi/rozwoj-przywodztwa', destination: '/leadership#przywodztwo', permanent: true },
+      { source: '/uslugi/innowacje-kultura-organizacji', destination: '/leadership#kultura', permanent: true },
+      { source: '/uslugi/gallup-mapy-kompetencji', destination: '/leadership/mapy-kompetencji', permanent: true },
+    ];
+  },
   output: 'standalone',
   typescript: {
     // !! WARN !!

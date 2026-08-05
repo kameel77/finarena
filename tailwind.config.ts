@@ -9,62 +9,35 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: {
-          DEFAULT: '#2563eb',
-          dark: '#1d4ed8',
-          light: '#dbeafe',
-        },
-        secondary: '#64748b',
-        background: {
-          DEFAULT: '#ffffff',
-          secondary: '#f8fafc',
-          tertiary: '#f1f5f9',
-        },
-        text: {
-          primary: '#1e293b',
-          secondary: '#64748b',
-          light: '#94a3b8',
-        },
-        border: '#e2e8f0',
+        paper: { DEFAULT: '#F6F3ED', 2: '#EFEBE3' },
+        card: '#FFFFFF',
+        ink: { DEFAULT: '#14181B', soft: '#3E464C', mute: '#767F87', faint: '#A9B0B6' },
+        accent: { DEFAULT: '#C24A26', hi: '#E05C31', soft: 'rgba(194,74,38,0.09)' },
+        hair: { DEFAULT: 'rgba(20,24,27,0.11)', strong: 'rgba(20,24,27,0.20)' },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+        serif: ['var(--font-serif)', 'Georgia', 'serif'],
+        mono: ['var(--font-mono)', 'monospace'],
       },
-      animation: {
-        'fade-in': 'fadeIn 0.5s ease-in-out',
-        'slide-up': 'slideUp 0.5s ease-out',
-        'slide-in': 'slideIn 0.3s ease-out',
+      borderRadius: { DEFAULT: '3px', sm: '2px', md: '3px', lg: '4px', xl: '6px' },
+      maxWidth: { site: '1280px' },
+      boxShadow: {
+        lift: '0 18px 44px -26px rgba(20,24,27,0.32)',
       },
       keyframes: {
-        fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
-        },
-        slideUp: {
-          '0%': { transform: 'translateY(20px)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
-        },
-        slideIn: {
-          '0%': { transform: 'translateX(-10px)', opacity: '0' },
-          '100%': { transform: 'translateX(0)', opacity: '1' },
-        },
+        fadeUp: { '0%': { opacity: '0', transform: 'translateY(18px)' }, '100%': { opacity: '1', transform: 'none' } },
+        panelIn: { '0%': { opacity: '0', transform: 'translateY(8px)' }, '100%': { opacity: '1', transform: 'none' } },
+        marquee: { '100%': { transform: 'translateX(-50%)' } },
       },
-      boxShadow: {
-        'sm': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-        'md': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-        'lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-      },
-      borderRadius: {
-        'sm': '6px',
-        'md': '8px',
-        'lg': '12px',
-        'xl': '16px',
+      animation: {
+        'fade-up': 'fadeUp .8s cubic-bezier(.2,.8,.2,1) both',
+        'panel-in': 'panelIn .45s ease both',
+        marquee: 'marquee 44s linear infinite',
       },
     },
   },
-  plugins: [
-    require('@tailwindcss/typography'),
-  ],
+  plugins: [require('@tailwindcss/typography')],
 };
 
 export default config;

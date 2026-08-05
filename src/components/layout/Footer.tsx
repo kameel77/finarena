@@ -1,108 +1,88 @@
 import Link from 'next/link';
-import Image from 'next/image';
-import { Linkedin, Twitter, Facebook, Mail, Phone, MapPin } from 'lucide-react';
+import { Linkedin, Mail, MapPin, Phone } from 'lucide-react';
 
-const footerLinks = {
-  services: [
-    { href: '/uslugi/ai', label: 'Rozwiązania AI' },
-    { href: '/uslugi/automatyzacje', label: 'Automatyzacja' },
-    { href: '/uslugi/mvp', label: 'POC/MVP' },
-    { href: '/uslugi/gallup-mapy-kompetencji', label: 'Mapy Kompetencji' },
-  ],
-  development: [
-    { href: '/uslugi/rozwoj-przywodztwa', label: 'Przywództwo' },
-    { href: '/uslugi/innowacje-kultura-organizacji', label: 'Kultura Innowacji' },
-    { href: '/uslugi/mentoring', label: 'Executive Mentoring' },
-  ],
-  company: [
-    { href: '/kontakt', label: 'Kontakt' },
-    { href: '/blog', label: 'Blog' },
-    { href: '/case-studies', label: 'Case Studies' },
-  ],
-};
+const cols = [
+  {
+    title: 'Sektory',
+    links: [
+      { href: '/sektory/automotive', label: 'Automotive' },
+      { href: '/sektory/legal', label: 'Legal' },
+      { href: '/sektory/hr', label: 'HR & Talent' },
+    ],
+  },
+  {
+    title: 'Build',
+    links: [
+      { href: '/build#proces', label: 'POC / MVP' },
+      { href: '/build#ai', label: 'Wdrożenia AI' },
+      { href: '/build#automatyzacja', label: 'Automatyzacja procesów' },
+      { href: '/build#scale', label: 'Pełne wdrożenia' },
+    ],
+  },
+  {
+    title: 'Leadership',
+    links: [
+      { href: '/leadership#mentoring', label: 'Executive mentoring' },
+      { href: '/leadership/mapy-kompetencji', label: 'Mapy kompetencji Gallup' },
+      { href: '/leadership#przywodztwo', label: 'Rozwój przywództwa' },
+      { href: '/leadership#kultura', label: 'Kultura innowacji' },
+    ],
+  },
+];
 
 export function Footer() {
   return (
-    <footer className="bg-text-primary text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-          {/* Brand */}
-          <div className="lg:col-span-1">
-            <Link href="/" className="flex items-center mb-6 max-w-[160px]">
-              <Image src="/images/finarena-logo.svg" alt="Finarena Logo" width={200} height={40} className="w-full h-auto brightness-0 invert" />
+    <footer className="bg-paper-2 border-t border-hair pt-16 pb-9">
+      <div className="wrap">
+        <div className="grid md:grid-cols-2 lg:grid-cols-[1.618fr_1fr_1fr_1fr] gap-11 mb-12">
+          <div>
+            <Link href="/" className="flex items-baseline gap-2.5">
+              <span className="font-serif text-[25px] leading-none text-accent">Φ</span>
+              <span className="font-semibold tracking-[0.04em]">FINARENA</span>
             </Link>
-            <p className="text-gray-400 text-sm mb-6">
-              Przyspieszamy rozwój firm przez połączenie technologii AI, automatyzacji procesów oraz rozwoju kompetencji i kultury organizacyjnej.
+            <p className="text-ink-mute text-[14px] max-w-[36ch] mt-4">
+              Budujemy procesy i aplikacje — i rozwijamy ludzi, którzy je prowadzą.
             </p>
-            <div className="flex gap-4">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors" aria-label="LinkedIn">
-                <Linkedin className="w-5 h-5" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors" aria-label="Twitter">
-                <Twitter className="w-5 h-5" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors" aria-label="Facebook">
-                <Facebook className="w-5 h-5" />
-              </a>
+            <ul className="mt-6 space-y-2.5 text-[13.5px] text-ink-soft">
+              <li className="flex items-center gap-2.5">
+                <MapPin className="w-4 h-4 text-ink-faint" /> ul. Alternatywy 7/135, 02-775 Warszawa
+              </li>
+              <li className="flex items-center gap-2.5">
+                <Mail className="w-4 h-4 text-ink-faint" />
+                <a href="mailto:kontakt@finarena.pl" className="hover:text-accent">kontakt@finarena.pl</a>
+              </li>
+              <li className="flex items-center gap-2.5">
+                <Phone className="w-4 h-4 text-ink-faint" />
+                <a href="tel:+48502358645" className="hover:text-accent">+48 502 358 645</a>
+              </li>
+            </ul>
+          </div>
+
+          {cols.map((col) => (
+            <div key={col.title}>
+              <h5 className="kicker text-ink-faint mb-4">{col.title}</h5>
+              <ul className="flex flex-col gap-2.5">
+                {col.links.map((l) => (
+                  <li key={l.href}>
+                    <Link href={l.href} className="text-[14px] text-ink-soft hover:text-accent transition-colors">
+                      {l.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
-          </div>
-
-          {/* Services */}
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider mb-4">Usługi</h3>
-            <ul className="space-y-3">
-              {footerLinks.services.map((link) => (
-                <li key={link.href}>
-                  <Link href={link.href} className="text-gray-400 hover:text-white transition-colors text-sm">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Development */}
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider mb-4">Rozwój</h3>
-            <ul className="space-y-3">
-              {footerLinks.development.map((link) => (
-                <li key={link.href}>
-                  <Link href={link.href} className="text-gray-400 hover:text-white transition-colors text-sm">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider mb-4">Kontakt</h3>
-            <ul className="space-y-3">
-              <li>
-                <a href="mailto:kontakt@finarena.pl" className="text-gray-400 hover:text-white transition-colors text-sm flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
-                  kontakt@finarena.pl
-                </a>
-              </li>
-              <li>
-                <a href="tel:+48123456789" className="text-gray-400 hover:text-white transition-colors text-sm flex items-center gap-2">
-                  <Phone className="w-4 h-4" />
-                  +48 502 358 645
-                </a>
-              </li>
-              <li className="text-gray-400 text-sm flex items-start gap-2">
-                <MapPin className="w-4 h-4 mt-0.5" />
-                <span>ul. Alternatywy 7 lok. 135<br />02-775 Warszawa</span>
-              </li>
-            </ul>
-          </div>
+          ))}
         </div>
 
-        <div className="border-t border-gray-800 mt-12 pt-8">
-          <p className="text-gray-400 text-sm text-center">
-            © {new Date().getFullYear()} Finarena. Wszelkie prawa zastrzeżone.
-          </p>
+        <div className="flex flex-wrap gap-4 justify-between items-center border-t border-hair pt-6 text-[12.5px] text-ink-faint">
+          <span>© {new Date().getFullYear()} Finarena</span>
+          <div className="flex items-center gap-5">
+            <a href="https://www.linkedin.com/company/finarena" target="_blank" rel="noopener" aria-label="LinkedIn" className="hover:text-accent">
+              <Linkedin className="w-4 h-4" />
+            </a>
+            <Link href="/ludzie" className="hover:text-accent">Ludzie</Link>
+            <span className="kicker">Designed in Φ</span>
+          </div>
         </div>
       </div>
     </footer>

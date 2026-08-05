@@ -1,92 +1,64 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Instrument_Sans, Instrument_Serif, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { generateOrganizationSchema, generateWebSiteSchema } from '@/lib/schema';
 
-const inter = Inter({ subsets: ['latin'] });
+const sans = Instrument_Sans({ subsets: ['latin', 'latin-ext'], variable: '--font-sans', display: 'swap' });
+const serif = Instrument_Serif({ subsets: ['latin'], weight: '400', style: ['normal', 'italic'], variable: '--font-serif', display: 'swap' });
+const mono = JetBrains_Mono({ subsets: ['latin'], weight: ['400', '500'], variable: '--font-mono', display: 'swap' });
+
+const DESC =
+  'Budujemy oprogramowanie produkcyjne — od POC po pełne wdrożenie — i rozwijamy liderów, którzy je poprowadzą. Automotive, legal, HR.';
 
 export const metadata: Metadata = {
   title: {
-    default: 'Finarena - Doradztwo Biznesowe i Transformacja Cyfrowa',
+    default: 'Finarena — budujemy procesy i aplikacje, nie tylko doradzamy',
     template: '%s | Finarena',
   },
-  description: 'Finarena dostarcza usługi doradcze w zakresie AI, automatyzacji procesów, rozwoju kompetencji liderskich i mapowania talentów Gallup Strengths.',
-  keywords: ['doradztwo biznesowe', 'AI', 'automatyzacja', 'Gallup Strengths', 'rozwój liderów', 'transformacja cyfrowa'],
+  description: DESC,
+  keywords: [
+    'software house', 'MVP', 'POC', 'wdrożenia AI', 'automatyzacja procesów',
+    'executive mentoring', 'CliftonStrengths', 'Gallup', 'rozwój przywództwa',
+    'oprogramowanie dla automotive', 'legal tech', 'HR tech',
+  ],
   authors: [{ name: 'Finarena' }],
   creator: 'Finarena',
   publisher: 'Finarena',
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://finarena.pl'),
-  alternates: {
-    canonical: '/',
-  },
-  icons: {
-    icon: '/images/finarena.svg',
-  },
+  alternates: { canonical: '/' },
+  icons: { icon: '/images/finarena.svg' },
   openGraph: {
     type: 'website',
     locale: 'pl_PL',
     url: '/',
     siteName: 'Finarena',
-    title: 'Finarena - Doradztwo Biznesowe i Transformacja Cyfrowa',
-    description: 'Przyspieszamy rozwój firm przez połączenie technologii AI, automatyzacji oraz rozwoju kompetencji i kultury organizacyjnej.',
-    images: [
-      {
-        url: '/og-image.jpg',
-        width: 1200,
-        height: 630,
-        alt: 'Finarena - Transformacja Biznesowa',
-      },
-    ],
+    title: 'Finarena — budujemy procesy i aplikacje, nie tylko doradzamy',
+    description: DESC,
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'Finarena' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Finarena - Doradztwo Biznesowe i Transformacja Cyfrowa',
-    description: 'Przyspieszamy rozwój firm przez połączenie technologii AI, automatyzacji oraz rozwoju kompetencji i kultury organizacyjnej.',
+    title: 'Finarena — budujemy procesy i aplikacje, nie tylko doradzamy',
+    description: DESC,
     images: ['/og-image.jpg'],
   },
   robots: {
     index: true,
     follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
-  },
-  verification: {
-    google: 'your-google-verification-code',
+    googleBot: { index: true, follow: true, 'max-video-preview': -1, 'max-image-preview': 'large', 'max-snippet': -1 },
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const organizationSchema = generateOrganizationSchema();
-  const websiteSchema = generateWebSiteSchema();
-
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pl">
+    <html lang="pl" className={`${sans.variable} ${serif.variable} ${mono.variable}`}>
       <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(organizationSchema),
-          }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(websiteSchema),
-          }}
-        />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(generateOrganizationSchema()) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(generateWebSiteSchema()) }} />
       </head>
-      <body className={inter.className}>
+      <body>
         <Header />
         <main>{children}</main>
         <Footer />

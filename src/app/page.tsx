@@ -1,30 +1,27 @@
-import { Metadata } from 'next';
-import { HeroSection } from '@/components/sections/HeroSection';
-// import { ClientsSection } from '@/components/sections/ClientsSection';
-import { ClientsSection } from '@/components/sections/ClientsSection';
-import { ServicesSection } from '@/components/sections/ServicesSection';
-import { ApproachSection } from '@/components/sections/ApproachSection';
-import { ProgramsSection } from '@/components/sections/ProgramsSection';
-import { StatsSection } from '@/components/sections/StatsSection';
-// import { TestimonialsSection } from '@/components/sections/TestimonialsSection'; // TODO: Uncomment when real testimonials are available
-import { CTASection } from '@/components/sections/CTASection';
-
-export const metadata: Metadata = {
-  title: 'Finarena - Doradztwo Biznesowe i Transformacja Cyfrowa',
-  description: 'Przyspieszamy rozwój firm przez połączenie technologii AI, automatyzacji procesów oraz rozwoju kompetencji i kultury organizacyjnej.',
-};
+import { Hero } from '@/components/sections/Hero';
+import { LogoTicker } from '@/components/sections/LogoTicker';
+import { CredibilityStrip } from '@/components/sections/CredibilityStrip';
+import { Paths } from '@/components/sections/Paths';
+import { Sectors } from '@/components/sections/Sectors';
+import { Delivery } from '@/components/sections/Delivery';
+import { People } from '@/components/sections/People';
+import { Manifest } from '@/components/sections/Manifest';
+import { Stats } from '@/components/sections/Stats';
+import { ContactSection } from '@/components/sections/ContactSection';
 
 export default function HomePage() {
   return (
     <>
-      <HeroSection />
-      <ServicesSection />
-      <ApproachSection />
-      <ProgramsSection />
-      <StatsSection />
-      <ClientsSection />
-      {/* <TestimonialsSection /> */} {/* TODO: Uncomment when real testimonials are available */}
-      <CTASection />
+      <Hero />
+      <LogoTicker />
+      <Paths />
+      <CredibilityStrip />
+      <Sectors />
+      <Delivery />
+      <People />
+      <Manifest />
+      <Stats />
+      <ContactSection />
     </>
   );
 }

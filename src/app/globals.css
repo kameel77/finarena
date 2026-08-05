@@ -2,54 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 30, 41, 59;
-  --background-start-rgb: 255, 255, 255;
-  --background-end-rgb: 255, 255, 255;
+@layer base {
+  html { scroll-behavior: smooth; }
+  body {
+    @apply bg-paper text-ink font-sans antialiased;
+    line-height: 1.55;
+  }
+  h1, h2, h3, h4 { letter-spacing: -0.025em; font-weight: 500; line-height: 1.08; }
+  ::selection { background: #C24A26; color: #fff; }
+  ::-webkit-scrollbar { width: 9px; }
+  ::-webkit-scrollbar-track { background: #EFEBE3; }
+  ::-webkit-scrollbar-thumb { background: #C6C0B5; border-radius: 4px; }
 }
 
-@layer base {
-  html {
-    scroll-behavior: smooth;
-  }
-  
-  body {
-    color: rgb(var(--foreground-rgb));
-    background: linear-gradient(
-        to bottom,
-        transparent,
-        rgb(var(--background-end-rgb))
-      )
-      rgb(var(--background-start-rgb));
-  }
+@layer components {
+  .wrap { @apply max-w-site mx-auto px-5 md:px-9; }
+  .kicker { @apply font-mono text-[10.5px] tracking-[0.15em] uppercase; }
+  .eyebrow { @apply kicker text-accent flex items-center gap-3 mb-6 before:content-[''] before:w-[22px] before:h-px before:bg-accent; }
+  .lede { @apply text-[17px] md:text-[18px] text-ink-soft; }
+  .sub { @apply text-[16.5px] text-ink-soft max-w-[62ch]; }
+  .btn { @apply inline-flex items-center gap-2 px-[22px] py-3 text-[13.5px] font-medium rounded border border-transparent transition-all duration-300 cursor-pointer; }
+  .btn-primary { @apply btn bg-ink text-paper hover:bg-accent; }
+  .btn-accent { @apply btn bg-accent text-white hover:bg-accent-hi; }
+  .btn-ghost { @apply btn border-hair-strong text-ink hover:bg-ink hover:text-paper hover:border-ink; }
+  .btn-ghost-dark { @apply btn border-white/25 text-paper hover:bg-paper hover:text-ink; }
+  .hairline { @apply border-hair; }
+  .chip { @apply font-mono text-[9.5px] tracking-[0.06em] px-2 py-1 border border-hair-strong text-ink-mute rounded-sm; }
+  .field { @apply w-full bg-card border border-hair-strong text-ink px-4 py-3.5 text-[14.5px] rounded transition-colors focus:outline-none focus:border-accent placeholder:text-ink-faint; }
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #94a3b8;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
-}
-
-/* Selection color */
-::selection {
-  background-color: #dbeafe;
-  color: #1d4ed8;
+  .balance { text-wrap: balance; }
 }
