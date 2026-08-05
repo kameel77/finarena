@@ -62,9 +62,12 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Health check using wget (alpine has it)
+# Health check — must use 127.0.0.1, not localhost.
+# Next.js standalone binds to 0.0.0.0 (IPv4 only), while busybox wget resolves
+# "localhost" to ::1 first and gets connection refused -> container marked
+# unhealthy -> Traefik drops it from the pool -> "no available server".
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD wget --quiet --tries=1 --spider http://localhost:3000/api/health || exit 1
+  CMD wget --quiet --tries=1 --spider http://127.0.0.1:3000/api/health || exit 1
 
 # Start the application using the standalone server
 CMD ["node", "server.js"]
