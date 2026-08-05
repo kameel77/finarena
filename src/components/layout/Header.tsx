@@ -42,9 +42,8 @@ export function Header() {
       }`}
     >
       <div className="wrap flex items-center justify-between h-[74px]">
-        <Link href="/" className="flex items-baseline gap-2.5 shrink-0">
-          <span className="font-serif text-[25px] leading-none text-accent">Φ</span>
-          <Image src="/images/finarena-logo.svg" alt="Finarena" width={150} height={30} priority className="h-[18px] w-auto" />
+        <Link href="/" className="shrink-0" aria-label="Finarena — strona główna">
+          <Image src="/images/finarena-logo.svg" alt="Finarena" width={190} height={33} priority className="h-[22px] w-auto" />
         </Link>
 
         <nav className="hidden lg:flex items-center gap-8">

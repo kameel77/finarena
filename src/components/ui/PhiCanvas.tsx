@@ -55,21 +55,42 @@ function spiral(): Pt[] {
   });
 }
 
-function glyph(): Pt[] {
+/**
+ * Canvas nie rozwija zmiennych CSS w ctx.font — `var(--font-serif)` daje
+ * nieprawidłowy ciąg, przypisanie jest ignorowane i zostaje domyślne
+ * 10px sans-serif, przez co glif renderuje się jako punkcik. Rodzinę
+ * trzeba odczytać z computed style i wstawić dosłownie.
+ */
+function serifFamily(): string {
+  const v = getComputedStyle(document.documentElement).getPropertyValue('--font-serif').trim();
+  return v ? `${v}, Georgia, serif` : 'Georgia, "Times New Roman", serif';
+}
+
+function samplePool(family: string, n: number): Pt[] {
   const c = document.createElement('canvas');
-  const n = 170;
   c.width = c.height = n;
-  const q = c.getContext('2d');
-  if (!q) return spiral();
+  const q = c.getContext('2d', { willReadFrequently: true });
+  if (!q) return [];
+  q.clearRect(0, 0, n, n);
   q.fillStyle = '#000';
   q.textAlign = 'center';
   q.textBaseline = 'middle';
-  q.font = `400 ${Math.round(n * 0.94)}px var(--font-serif), Georgia, serif`;
+  q.font = `400 ${Math.round(n * 0.94)}px ${family}`;
   q.fillText('Φ', n / 2, n / 2 + n * 0.02);
   const d = q.getImageData(0, 0, n, n).data;
   const pool: Pt[] = [];
-  for (let y = 0; y < n; y += 2) for (let x = 0; x < n; x += 2) if (d[(y * n + x) * 4 + 3] > 110) pool.push({ x: x / n, y: y / n });
-  if (!pool.length) return spiral();
+  for (let y = 0; y < n; y += 2) for (let x = 0; x < n; x += 2) {
+    if (d[(y * n + x) * 4 + 3] > 110) pool.push({ x: x / n, y: y / n });
+  }
+  return pool;
+}
+
+function glyph(): Pt[] {
+  const n = 170;
+  let pool = samplePool(serifFamily(), n);
+  // Za mała próbka = font się nie załadował albo nie ma glifu Φ — bierzemy generyczny serif.
+  if (pool.length < 250) pool = samplePool('Georgia, "Times New Roman", serif', n);
+  if (pool.length < 100) return spiral();
   return Array.from({ length: N }, () => {
     const p = pool[Math.floor(Math.random() * pool.length)];
     return { x: p.x + (Math.random() - 0.5) * 0.006, y: p.y + (Math.random() - 0.5) * 0.006 };
@@ -94,8 +115,14 @@ export function PhiCanvas() {
     const mouse = { x: -9e9, y: -9e9 };
 
     const T: Pt[][] = [chaos(), lattice(), chaos(), spiral()];
-    if (document.fonts) document.fonts.ready.then(() => { T[2] = glyph(); });
-    else T[2] = glyph();
+    const buildGlyph = () => { T[2] = glyph(); };
+    if (document.fonts) {
+      document.fonts.ready.then(buildGlyph);
+      // Safari potrafi rozstrzygnąć fonts.ready przed podmianą webfontu.
+      window.setTimeout(buildGlyph, 1200);
+    } else {
+      buildGlyph();
+    }
 
     const P = Array.from({ length: N }, () => ({
       ox: 0, oy: 0, d: Math.random() * 0.34, acc: Math.random() < 0.13, s: 0.7 + Math.random() * 0.9,

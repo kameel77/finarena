@@ -13,8 +13,8 @@ export function Manifest() {
             <path d="M10 158 A148 148 0 0 1 158 10" stroke="#C24A26" strokeWidth="1.3" />
             <path d="M158 10 A92 92 0 0 1 250 102" stroke="#C24A26" strokeWidth="1.3" />
             <path d="M250 102 A56 56 0 0 1 194 158" stroke="#C24A26" strokeWidth="1.3" />
-            <text x="60" y="216" fontFamily="var(--font-serif), Georgia, serif" fontSize="66" fill="#C24A26">Φ</text>
-            <text x="116" y="216" fontFamily="var(--font-mono), monospace" fontSize="11.5" fill="#A9B0B6">= 1,618…</text>
+            <text x="60" y="216" fontFamily="Georgia, serif" fontSize="66" fill="#C24A26">Φ</text>
+            <text x="116" y="216" fontFamily="monospace" fontSize="11.5" fill="#A9B0B6">= 1,618…</text>
           </svg>
         </div>
         <Reveal>

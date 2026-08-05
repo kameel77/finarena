@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { Linkedin, Mail, MapPin, Phone } from 'lucide-react';
 
@@ -36,9 +37,8 @@ export function Footer() {
       <div className="wrap">
         <div className="grid md:grid-cols-2 lg:grid-cols-[1.618fr_1fr_1fr_1fr] gap-11 mb-12">
           <div>
-            <Link href="/" className="flex items-baseline gap-2.5">
-              <span className="font-serif text-[25px] leading-none text-accent">Φ</span>
-              <span className="font-semibold tracking-[0.04em]">FINARENA</span>
+            <Link href="/" aria-label="Finarena — strona główna" className="inline-block">
+              <Image src="/images/finarena-logo.svg" alt="Finarena" width={190} height={33} className="h-[22px] w-auto" />
             </Link>
             <p className="text-ink-mute text-[14px] max-w-[36ch] mt-4">
               Budujemy procesy i aplikacje — i rozwijamy ludzi, którzy je prowadzą.
