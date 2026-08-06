@@ -7,7 +7,7 @@ import { ContactSection } from '@/components/sections/ContactSection';
 import { sectors } from '@/lib/content';
 
 export const metadata: Metadata = {
-  title: 'Finarena Build — POC, MVP i pełne wdrożenia programistyczne',
+  title: 'Finarena Build: POC, MVP i pełne wdrożenia programistyczne',
   description:
     'Budujemy oprogramowanie produkcyjne: od POC w 3 tygodnie, przez MVP, po pełne wdrożenie i utrzymanie. Wdrożenia AI, automatyzacja procesów, integracje.',
 };
@@ -52,9 +52,9 @@ const faqs = [
   { q: 'Ile trwa pierwsze działające wdrożenie?', a: 'POC zamykamy zwykle w 2–3 tygodnie, MVP w 6–10. Pierwsze usprawnienia procesowe bywają widoczne już po 2–4 tygodniach.' },
   { q: 'Czy musimy mieć własny dział IT lub data science?', a: 'Nie. Projektujemy rozwiązania tak, by były utrzymywalne przez zespół biznesowo-operacyjny, a dokumentację i szkolenie zostawiamy po swojej stronie umowy.' },
   { q: 'Czy automatyzacja wymaga wymiany obecnych narzędzi?', a: 'Zazwyczaj nie. Wykorzystujemy obecny stack i dokładamy brakujące połączenia. Wymianę proponujemy tylko wtedy, gdy koszt utrzymania starego rozwiązania przewyższa koszt migracji.' },
-  { q: 'Jak mierzymy sukces wdrożenia?', a: 'KPI ustalamy na starcie — czas procesu, koszt, jakość, konwersja — i raportujemy postęp co tydzień. Kryterium sukcesu jest częścią zakresu, nie dodatkiem.' },
+  { q: 'Jak mierzymy sukces wdrożenia?', a: 'KPI ustalamy na starcie: czas procesu, koszt, jakość, konwersja. Postęp raportujemy co tydzień. Kryterium sukcesu jest częścią zakresu, nie dodatkiem.' },
   { q: 'Co, jeśli chcemy przejąć projekt do siebie?', a: 'Przewidujemy to w umowie. Etap Run może się skończyć transferem systemu, dokumentacji i zespołu po Twojej stronie. Nie budujemy zależności od nas.' },
-  { q: 'Czy pracujecie tylko w automotive, legal i HR?', a: 'Nie. To wertykały, w których mamy własne produkty. W nowy obszar wchodzimy tą samą metodą — z partnerem znającym branżę, przez Discovery i POC.' },
+  { q: 'Czy pracujecie tylko w automotive, legal i HR?', a: 'Nie. To wertykały, w których mamy własne produkty. W nowy obszar wchodzimy tą samą metodą: z partnerem znającym branżę, przez Discovery i POC.' },
 ];
 
 export default function BuildPage() {
@@ -72,7 +72,7 @@ export default function BuildPage() {
       <Block eyebrow="Problem" title="Dlaczego wdrożenia się nie udają">
         <div className="space-y-4 text-[15.5px] text-ink-soft max-w-[68ch]">
           <p>
-            Firmy budują „za dużo, za długo”. Brakuje jasnych hipotez, priorytetów i kryteriów sukcesu — efektem są
+            Firmy budują „za dużo, za długo”. Brakuje jasnych hipotez, priorytetów i kryteriów sukcesu. Efektem są
             wysokie koszty, opóźnienia i produkt niedopasowany do rynku.
           </p>
           <p>

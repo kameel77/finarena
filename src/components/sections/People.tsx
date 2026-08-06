@@ -14,7 +14,7 @@ export function People() {
               W Finarenie kupujesz <em className="font-serif italic font-normal text-accent">konkretne osoby</em>, nie logo.
             </h2>
             <p className="sub">
-              Doradztwo sprzedaje się nazwiskiem i dorobkiem. Poniżej osoby, które prowadzą projekty — nie anonimowy
+              Doradztwo sprzedaje się nazwiskiem i dorobkiem. Poniżej osoby, które prowadzą projekty, nie anonimowy
               „zespół ekspertów”.
             </p>
           </>

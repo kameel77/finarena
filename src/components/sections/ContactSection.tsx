@@ -4,7 +4,7 @@ import { LeadForm } from '@/components/sections/LeadForm';
 const steps = [
   { k: 'Krok 1', v: '30-minutowa rozmowa diagnostyczna. Bez zobowiązań.' },
   { k: 'Krok 2', v: 'Ramowa propozycja zakresu i budżetu w ciągu 3 dni.' },
-  { k: 'Krok 3', v: 'Discovery lub POC — startujemy zwykle w 2 tygodnie.' },
+  { k: 'Krok 3', v: 'Discovery lub POC. Startujemy zwykle w 2 tygodnie.' },
 ];
 
 export function ContactSection({ id = 'kontakt' }: { id?: string }) {
@@ -18,7 +18,7 @@ export function ContactSection({ id = 'kontakt' }: { id?: string }) {
               Powiedz nam, gdzie <em className="font-serif italic font-normal text-accent">utknęło</em>.
             </h2>
             <p className="sub mb-8">
-              Odpowiadamy w 24 h roboczych. Pierwsza rozmowa to 30 minut i konkretna rekomendacja — nie prezentacja o nas.
+              Odpowiadamy w 24 h roboczych. Pierwsza rozmowa to 30 minut i konkretna rekomendacja, nie prezentacja o nas.
             </p>
             <ul>
               {steps.map((s) => (

@@ -24,11 +24,11 @@ const serif = Instrument_Serif({
 const mono = JetBrains_Mono({ subsets: ['latin'], weight: ['400', '500'], variable: '--font-mono', display: 'swap' });
 
 const DESC =
-  'Budujemy oprogramowanie produkcyjne — od POC po pełne wdrożenie — i rozwijamy liderów, którzy je poprowadzą. Automotive, legal, HR.';
+  'Budujemy oprogramowanie produkcyjne, od POC po pełne wdrożenie, i rozwijamy liderów, którzy je poprowadzą. Automotive, legal, HR.';
 
 export const metadata: Metadata = {
   title: {
-    default: 'Finarena — budujemy procesy i aplikacje, nie tylko doradzamy',
+    default: 'Finarena. Budujemy procesy i aplikacje, nie tylko doradzamy',
     template: '%s | Finarena',
   },
   description: DESC,
@@ -48,13 +48,13 @@ export const metadata: Metadata = {
     locale: 'pl_PL',
     url: '/',
     siteName: 'Finarena',
-    title: 'Finarena — budujemy procesy i aplikacje, nie tylko doradzamy',
+    title: 'Finarena. Budujemy procesy i aplikacje, nie tylko doradzamy',
     description: DESC,
     images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'Finarena' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Finarena — budujemy procesy i aplikacje, nie tylko doradzamy',
+    title: 'Finarena. Budujemy procesy i aplikacje, nie tylko doradzamy',
     description: DESC,
     images: ['/og-image.jpg'],
   },

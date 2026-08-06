@@ -8,7 +8,7 @@ export function Delivery() {
         <Reveal className="max-w-[58ch] mb-14">
           <>
             <div className="kicker text-accent-hi flex items-center gap-3 mb-6 before:content-[''] before:w-[22px] before:h-px before:bg-accent-hi">
-              Finarena Build — od POC do produkcji
+              Finarena Build · od POC do produkcji
             </div>
             <h2 className="text-[clamp(30px,3.7vw,46px)] mb-4">
               Zaczynamy od najtańszego dowodu. Kończymy na{' '}

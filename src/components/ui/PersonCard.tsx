@@ -17,7 +17,7 @@ export function PersonCard({ person, priority = false }: { person: Person; prior
           />
         ) : (
           <span className="absolute inset-0 flex items-center justify-center text-center px-5 kicker text-ink-faint">
-            Zdjęcie — sesja własna
+            Zdjęcie · sesja własna
           </span>
         )}
       </div>
@@ -31,7 +31,7 @@ export function PersonCard({ person, priority = false }: { person: Person; prior
             href={person.linkedin}
             target="_blank"
             rel="noopener"
-            aria-label={`LinkedIn — ${person.name}`}
+            aria-label={`LinkedIn, ${person.name}`}
             className="shrink-0 mt-1 text-ink-faint hover:text-accent transition-colors"
           >
             <Linkedin className="w-[18px] h-[18px]" />

@@ -56,7 +56,7 @@ function spiral(): Pt[] {
 }
 
 /**
- * Canvas nie rozwija zmiennych CSS w ctx.font — `var(--font-serif)` daje
+ * Canvas nie rozwija zmiennych CSS w ctx.font, więc `var(--font-serif)` daje
  * nieprawidłowy ciąg, przypisanie jest ignorowane i zostaje domyślne
  * 10px sans-serif, przez co glif renderuje się jako punkcik. Rodzinę
  * trzeba odczytać z computed style i wstawić dosłownie.
@@ -88,7 +88,7 @@ function samplePool(family: string, n: number): Pt[] {
 function glyph(): Pt[] {
   const n = 170;
   let pool = samplePool(serifFamily(), n);
-  // Za mała próbka = font się nie załadował albo nie ma glifu Φ — bierzemy generyczny serif.
+  // Za mała próbka = font się nie załadował albo nie ma glifu Φ, bierzemy generyczny serif.
   if (pool.length < 250) pool = samplePool('Georgia, "Times New Roman", serif', n);
   if (pool.length < 100) return spiral();
   return Array.from({ length: N }, () => {

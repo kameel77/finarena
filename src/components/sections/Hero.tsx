@@ -25,7 +25,7 @@ export function Hero() {
             <em className="font-serif italic font-normal text-accent">Budujemy je.</em>
           </h1>
           <p className="lede max-w-[50ch] mb-9">
-            Mamy działające produkty w automotive, legal i HR — i wiemy, dlaczego większość wdrożeń nie przyjmuje się
+            Mamy działające produkty w automotive, legal i HR. Wiemy, dlaczego większość wdrożeń nie przyjmuje się
             w organizacji. Dlatego prowadzimy dwa tory naraz: budujemy systemy i rozwijamy ludzi, którzy je poprowadzą.
           </p>
           <div className="flex flex-wrap gap-3 mb-12">

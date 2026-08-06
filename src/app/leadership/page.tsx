@@ -6,7 +6,7 @@ import { ContactSection } from '@/components/sections/ContactSection';
 import { People } from '@/components/sections/People';
 
 export const metadata: Metadata = {
-  title: 'Finarena Leadership — executive mentoring, przywództwo, kultura',
+  title: 'Finarena Leadership: executive mentoring, przywództwo, kultura',
   description:
     'Mentoring 1:1 dla właścicieli i C-level, programy rozwoju przywództwa, mapy kompetencji CliftonStrengths i praca nad kulturą organizacji.',
 };
@@ -51,7 +51,7 @@ const faqs = [
   { q: 'Dla kogo jest mentoring?', a: 'Dla właścicieli firm, członków zarządu i liderów odpowiedzialnych za wynik. Pracujemy na Twoich realnych decyzjach, nie na ogólnych modelach.' },
   { q: 'Czym mentoring różni się od szkolenia?', a: 'Szkolenie przekazuje wiedzę. Mentoring pracuje na konkretnej sytuacji, w której jesteś, i kończy się decyzją oraz planem wdrożenia.' },
   { q: 'Jak długo trwa program rozwoju przywództwa?', a: 'Wersja podstawowa to 8–12 tygodni. Programy obejmujące całą kadrę menedżerską rozkładamy zwykle na dwa kwartały.' },
-  { q: 'Czy kultura organizacyjna realnie wpływa na wyniki?', a: 'Tak — na tempo decyzji, jakość współpracy i skuteczność wdrażania strategii. Mierzymy to konkretami: retencja, eNPS, czas realizacji projektów, liczba eskalacji.' },
+  { q: 'Czy kultura organizacyjna realnie wpływa na wyniki?', a: 'Tak. Na tempo decyzji, jakość współpracy i skuteczność wdrażania strategii. Mierzymy to konkretami: retencja, eNPS, czas realizacji projektów, liczba eskalacji.' },
   { q: 'Jak uniknąć „projektu HR”, który nie działa operacyjnie?', a: 'Wiążemy działania z KPI biznesowymi i z odpowiedzialnością konkretnych liderów za wdrożenie. Bez właściciela po stronie biznesu nie zaczynamy.' },
   { q: 'Czy pracujecie razem z torem technologicznym?', a: 'Często tak i to jest nasza przewaga. Wdrożenie systemu i przygotowanie ludzi do jego prowadzenia idą wtedy równolegle, w jednym kontrakcie.' },
 ];
@@ -62,7 +62,7 @@ export default function LeadershipPage() {
       <PageHero
         eyebrow="Finarena Leadership"
         title={<>Rozwijamy ludzi, którzy <em className="font-serif italic font-normal text-accent">poprowadzą zmianę</em> po naszym wyjściu.</>}
-        lead="Butikowe doradztwo dla właścicieli, zarządów i liderów. Certyfikowana metodyka, praca na realnych decyzjach, mierzalny efekt — zamiast warsztatów bez konsekwencji."
+        lead="Butikowe doradztwo dla właścicieli, zarządów i liderów. Certyfikowana metodyka, praca na realnych decyzjach, mierzalny efekt zamiast warsztatów bez konsekwencji."
       >
         <Link href="/kontakt" className="btn-accent">Umów rozmowę <ArrowRight className="w-3.5 h-3.5" /></Link>
         <Link href="/leadership/mapy-kompetencji" className="btn-ghost">Mapy kompetencji Gallup</Link>

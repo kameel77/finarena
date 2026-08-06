@@ -7,7 +7,7 @@ import { ContactSection } from '@/components/sections/ContactSection';
 import { people } from '@/lib/content';
 
 export const metadata: Metadata = {
-  title: 'Ludzie — kto prowadzi projekty w Finarenie',
+  title: 'Ludzie. Kto prowadzi projekty w Finarenie',
   description: 'Osoby odpowiedzialne za tor Build i tor Leadership: doświadczenie, certyfikacje, dorobek.',
 };
 

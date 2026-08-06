@@ -43,7 +43,7 @@ export default function ContactPage() {
       <PageHero
         eyebrow="Kontakt"
         title={<>Pierwsza rozmowa to 30 minut i <em className="font-serif italic font-normal text-accent">konkretna rekomendacja</em>.</>}
-        lead="Nie prezentacja o nas. Powiedz, gdzie utknęło — wrócimy z ramową propozycją zakresu i budżetu w ciągu trzech dni roboczych."
+        lead="Nie prezentacja o nas. Powiedz, gdzie utknęło. Wrócimy z ramową propozycją zakresu i budżetu w ciągu trzech dni roboczych."
       />
       <ContactSection id="formularz" />
     </>

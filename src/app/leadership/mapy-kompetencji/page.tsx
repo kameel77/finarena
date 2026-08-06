@@ -11,11 +11,11 @@ export const metadata: Metadata = {
 };
 
 const stages = [
-  { t: 'Etap 1 — Discovery i kontekst biznesowy', items: ['Definiujemy cele organizacyjne: tempo delivery, retencja, jakość współpracy', 'Ustalamy KPI sukcesu wdrożenia', 'Mapujemy obszary największych napięć'] },
-  { t: 'Etap 2 — Diagnoza indywidualna', items: ['Badanie CliftonStrengths dla członków zespołu', 'Analiza profili: naturalne predyspozycje i ryzyka przeciążenia', 'Hipotezy dotyczące stylu pracy i współpracy'] },
-  { t: 'Etap 3 — Budowa mapy zespołowej', items: ['Łączymy profile w jeden obraz zespołu', 'Identyfikujemy luki i nadreprezentacje talentów', 'Przygotowujemy rekomendacje ról i odpowiedzialności'] },
-  { t: 'Etap 4 — Warsztat wdrożeniowy', items: ['Zespół uczy się pracować na wspólnym języku mocnych stron', 'Porządkujemy reguły współpracy i decyzyjności', 'Ustalamy konkretne rytuały operacyjne'] },
-  { t: 'Etap 5 — Praca z liderami i stabilizacja', items: ['Liderzy dostają narzędzia do świadomego delegowania', 'Wzmacniamy komunikację, feedback i ownership', 'Follow-up 6–12 tygodni: korekty i utrwalenie nawyków'] },
+  { t: 'Etap 1 · Discovery i kontekst biznesowy', items: ['Definiujemy cele organizacyjne: tempo delivery, retencja, jakość współpracy', 'Ustalamy KPI sukcesu wdrożenia', 'Mapujemy obszary największych napięć'] },
+  { t: 'Etap 2 · Diagnoza indywidualna', items: ['Badanie CliftonStrengths dla członków zespołu', 'Analiza profili: naturalne predyspozycje i ryzyka przeciążenia', 'Hipotezy dotyczące stylu pracy i współpracy'] },
+  { t: 'Etap 3 · Budowa mapy zespołowej', items: ['Łączymy profile w jeden obraz zespołu', 'Identyfikujemy luki i nadreprezentacje talentów', 'Przygotowujemy rekomendacje ról i odpowiedzialności'] },
+  { t: 'Etap 4 · Warsztat wdrożeniowy', items: ['Zespół uczy się pracować na wspólnym języku mocnych stron', 'Porządkujemy reguły współpracy i decyzyjności', 'Ustalamy konkretne rytuały operacyjne'] },
+  { t: 'Etap 5 · Praca z liderami i stabilizacja', items: ['Liderzy dostają narzędzia do świadomego delegowania', 'Wzmacniamy komunikację, feedback i ownership', 'Follow-up 6–12 tygodni: korekty i utrwalenie nawyków'] },
 ];
 
 const forOrg = [
@@ -40,7 +40,7 @@ const faqs = [
   { q: 'Ile trwa cały proces?', a: 'Od Discovery do warsztatu zwykle 4–6 tygodni, plus follow-up wdrożeniowy przez kolejne 6–12 tygodni.' },
   { q: 'Czy każdy musi wykonać badanie?', a: 'Mapa zespołowa ma sens, gdy obejmuje cały zespół lub całą warstwę decyzyjną. Przy pojedynczych osobach pracujemy raczej mentoringowo.' },
   { q: 'Co dostajemy na koniec?', a: 'Profile indywidualne, mapę talentów zespołu, rekomendacje ról i odpowiedzialności oraz ustalone zasady współpracy i rytuały operacyjne.' },
-  { q: 'Czy wyniki da się utrzymać po zakończeniu?', a: 'Po to jest follow-up i praca z liderami. Bez tego etapu nawyki wracają do stanu wyjściowego — dlatego nie sprzedajemy samego warsztatu.' },
+  { q: 'Czy wyniki da się utrzymać po zakończeniu?', a: 'Po to jest follow-up i praca z liderami. Bez tego etapu nawyki wracają do stanu wyjściowego, dlatego nie sprzedajemy samego warsztatu.' },
 ];
 
 export default function CompetencyMapsPage() {
@@ -63,7 +63,7 @@ export default function CompetencyMapsPage() {
               <ul className="space-y-2">
                 {s.items.map((i) => (
                   <li key={i} className="text-[14.5px] text-ink-soft flex gap-3">
-                    <span className="text-accent">—</span>
+                    <span className="text-accent">·</span>
                     {i}
                   </li>
                 ))}

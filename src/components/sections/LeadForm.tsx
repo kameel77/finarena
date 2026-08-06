@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { ArrowRight, Loader2 } from 'lucide-react';
 
-const tracks = ['Build — produkt / wdrożenie', 'Leadership — ludzie', 'Oba tory'];
+const tracks = ['Build · produkt lub wdrożenie', 'Leadership · ludzie', 'Oba tory'];
 const phases = ['Pomysł', 'Mam POC', 'Skaluję', 'Ratuję projekt'];
 
 function Chips({ options, value, onChange }: { options: string[]; value: string; onChange: (v: string) => void }) {
@@ -45,11 +45,11 @@ export function LeadForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           firstName: firstName || full,
-          lastName: rest.join(' ') || '—',
+          lastName: rest.join(' ') || 'brak',
           email: fd.get('email'),
           phone: fd.get('phone'),
           service: `${track} · etap: ${phase}`,
-          message: `${fd.get('message') || '—'}\n\nFirma: ${fd.get('company') || '—'}`,
+          message: `${fd.get('message') || 'brak'}\n\nFirma: ${fd.get('company') || 'brak'}`,
         }),
       });
       if (!res.ok) throw new Error((await res.json().catch(() => ({}))).message || 'Nie udało się wysłać wiadomości.');
@@ -93,7 +93,7 @@ export function LeadForm() {
       <textarea
         name="message"
         className="field min-h-[92px] resize-y mb-4"
-        placeholder="Kilka zdań o sytuacji — im konkretniej, tym lepsza pierwsza rozmowa."
+        placeholder="Kilka zdań o sytuacji. Im konkretniej, tym lepsza pierwsza rozmowa."
         required
       />
 

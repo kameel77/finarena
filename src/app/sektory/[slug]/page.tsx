@@ -50,7 +50,7 @@ export default function SectorPage({ params }: { params: { slug: string } }) {
               <div className="text-[17px] font-semibold mb-1.5 flex items-center gap-2">
                 <i className="w-[5px] h-[5px] rounded-full bg-accent shrink-0" />
                 {c.name}
-                {c.note ? <span className="text-[10px] text-ink-faint font-normal">— {c.note}</span> : null}
+                {c.note ? <span className="text-[10px] text-ink-faint font-normal">· {c.note}</span> : null}
               </div>
               <p className="text-[13.5px] text-ink-mute leading-relaxed">{c.desc}</p>
               <div className="flex gap-1.5 flex-wrap mt-4">

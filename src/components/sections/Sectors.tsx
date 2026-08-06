@@ -30,7 +30,7 @@ export function Sectors() {
               <em className="font-serif italic font-normal text-accent">tą samą metodą</em>.
             </h2>
             <p className="sub">
-              Każdy wertykał ma własny model danych, własne regulacje i własny sposób sprzedaży — dlatego nie udajemy,
+              Każdy wertykał ma własny model danych, własne regulacje i własny sposób sprzedaży, dlatego nie udajemy,
               że znamy każdą branżę od pierwszego dnia. Znamy natomiast sposób, w jaki się w nią wchodzi: partner
               znający realia, Discovery, POC na prawdziwych danych. Ryzyko nowego obszaru weryfikujemy w trzy tygodnie,
               nie w trzy kwartały.
@@ -71,7 +71,7 @@ export function Sectors() {
                       <i className="w-[5px] h-[5px] rounded-full bg-accent shrink-0" />
                       {c.name}
                       {(c as { note?: string }).note ? (
-                        <span className="text-[10px] text-ink-faint font-normal">— {(c as { note?: string }).note}</span>
+                        <span className="text-[10px] text-ink-faint font-normal">· {(c as { note?: string }).note}</span>
                       ) : null}
                     </div>
                     <div className="text-[13px] text-ink-mute leading-relaxed">{c.desc}</div>

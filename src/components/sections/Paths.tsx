@@ -11,7 +11,7 @@ const build = [
 
 const lead = [
   'Executive mentoring dla founderów i C-level',
-  'CliftonStrengths® — mapy kompetencji i matryce talentów',
+  'CliftonStrengths®: mapy kompetencji i matryce talentów',
   'Programy rozwoju przywództwa',
   'Kultura innowacji i modele operacyjne',
 ];
@@ -29,7 +29,7 @@ export function Paths() {
             </h2>
             <p className="sub">
               Wdrożenie, którego nikt w organizacji nie chce prowadzić, umiera po sześciu miesiącach. Dlatego jedno
-              i drugie robimy u tego samego klienta — ale wchodzisz tą ścieżką, która jest teraz Twoim problemem.
+              i drugie robimy u tego samego klienta, ale wchodzisz tą ścieżką, która jest teraz Twoim problemem.
             </p>
           </>
         </Reveal>
@@ -37,11 +37,11 @@ export function Paths() {
         <Reveal className="grid lg:grid-cols-2 gap-5">
           <>
             <div className="bg-ink text-paper border border-ink rounded p-8 md:p-11 flex flex-col transition-transform duration-300 hover:-translate-y-1">
-              <div className="kicker text-white/45 mb-5">Tor 1 — dla CTO, COO, foundera</div>
+              <div className="kicker text-white/45 mb-5">Tor 1 · dla CTO, COO, foundera</div>
               <h3 className="text-[30px] mb-1.5">Finarena Build</h3>
               <div className="text-accent-hi text-[13.5px] font-medium mb-4">Studio produktowe w wertykałach</div>
               <p className="text-[15px] text-white/70 mb-6 max-w-[44ch]">
-                Budujemy oprogramowanie produkcyjne — od POC po pełne wdrożenie i utrzymanie. Nie „projekt”, tylko
+                Budujemy oprogramowanie produkcyjne, od POC po pełne wdrożenie i utrzymanie. Nie „projekt”, tylko
                 sekwencja odwracalnych decyzji, w której każdy etap kończy się czymś działającym.
               </p>
               <ul className="mb-7 flex-1">
@@ -58,9 +58,9 @@ export function Paths() {
             </div>
 
             <div className="bg-card border border-hair rounded p-8 md:p-11 flex flex-col transition-all duration-300 hover:-translate-y-1 hover:border-ink hover:shadow-lift">
-              <div className="kicker text-ink-faint mb-5">Tor 2 — dla CEO, właściciela, zarządu</div>
+              <div className="kicker text-ink-faint mb-5">Tor 2 · dla CEO, właściciela, zarządu</div>
               <h3 className="text-[30px] mb-1.5">Finarena Leadership</h3>
-              <div className="text-accent text-[13.5px] font-medium mb-4">Butik doradczy — praca z ludźmi</div>
+              <div className="text-accent text-[13.5px] font-medium mb-4">Butik doradczy · praca z ludźmi</div>
               <p className="text-[15px] text-ink-soft mb-6 max-w-[44ch]">
                 Pracujemy z osobami, które podejmują decyzje, i z zespołami, które je wykonują. Certyfikowana metodyka,
                 mierzalny efekt, brak korporacyjnych warsztatów bez konsekwencji.

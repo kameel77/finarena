@@ -42,7 +42,7 @@ export function Header() {
       }`}
     >
       <div className="wrap flex items-center justify-between h-[74px]">
-        <Link href="/" className="shrink-0" aria-label="Finarena — strona główna">
+        <Link href="/" className="shrink-0" aria-label="Finarena, strona główna">
           <Image src="/images/finarena-logo.svg" alt="Finarena" width={190} height={33} priority className="h-[22px] w-auto" />
         </Link>
 

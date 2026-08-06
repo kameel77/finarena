@@ -22,10 +22,10 @@ export function Manifest() {
             <div className="eyebrow">Manifest</div>
             <blockquote className="font-serif italic text-[clamp(25px,2.9vw,38px)] leading-[1.28] tracking-[-0.01em]">
               Najlepsze systemy nie są ani zbyt złożone, ani zbyt proste. Są{' '}
-              <span className="text-accent">we właściwej proporcji</span> — między technologią, procesem i człowiekiem.
+              <span className="text-accent">we właściwej proporcji</span> między technologią, procesem i człowiekiem.
             </blockquote>
             <p className="mt-6 text-ink-mute text-[13.5px] max-w-[52ch]">
-              Φ to grecka litera oznaczająca złoty podział — zasadę, według której projektowano budowle przez dwa
+              Φ to grecka litera oznaczająca złoty podział: zasadę, według której projektowano budowle przez dwa
               tysiące lat. U nas nie jest ozdobą: wyznacza siatkę tej strony i sposób, w jaki dzielimy budżet projektu
               między system a ludzi, którzy mają go używać.
             </p>
