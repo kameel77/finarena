@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Reveal } from '@/components/ui/Reveal';
+import { PersonCard } from '@/components/ui/PersonCard';
 import { people } from '@/lib/content';
 
 export function People() {
@@ -19,19 +20,10 @@ export function People() {
           </>
         </Reveal>
 
-        <Reveal className="grid md:grid-cols-3 gap-5">
+        <Reveal className="grid md:grid-cols-2 gap-5 max-w-[880px]">
           <>
             {people.map((p) => (
-              <article key={p.name + p.role} className="border border-hair bg-card rounded overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lift">
-                <div className="aspect-[1/1.1] bg-gradient-to-br from-paper-2 to-[#E2DDD3] border-b border-hair flex items-center justify-center text-center px-5 kicker text-ink-faint">
-                  Zdjęcie — sesja własna
-                </div>
-                <div className="p-5">
-                  <div className="text-[18px] font-semibold">{p.name}</div>
-                  <div className="text-[13px] text-accent mt-0.5 mb-3">{p.role}</div>
-                  <p className="text-[13.5px] text-ink-mute leading-relaxed">{p.bio}</p>
-                </div>
-              </article>
+              <PersonCard key={p.name} person={p} />
             ))}
           </>
         </Reveal>

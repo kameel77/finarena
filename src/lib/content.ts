@@ -114,8 +114,31 @@ export const clientLogos = [
   'toyota-b.png', 'votenti-logo.svg',
 ];
 
-export const people = [
-  { name: 'Kamil Tonkowicz', role: 'Founder · Executive mentor', bio: 'Miejsce na biogram: doświadczenie, sektory, certyfikacje Gallup, publikacje i wystąpienia.' },
-  { name: 'Imię Nazwisko', role: 'Tech lead · Architektura', bio: 'Osoba odpowiedzialna za tor Build: stack, wdrożenia produkcyjne, doświadczenie w wertykałach.' },
-  { name: 'Imię Nazwisko', role: 'Konsultant · Rozwój organizacji', bio: 'Osoba odpowiedzialna za tor Leadership: metodyki, liczba przeprowadzonych sesji, branże.' },
+export type Person = {
+  name: string;
+  role: string;
+  focus: string;
+  bio: string;
+  linkedin: string;
+  /** /public/images/people/<plik>.jpg — 1600x2000 px, kadr 4:5 */
+  photo?: string;
+};
+
+export const people: Person[] = [
+  {
+    name: 'Kamil Tonkowicz',
+    role: 'Founder',
+    focus: 'Technologia, produkt, delivery',
+    bio: 'Odpowiada za tor Build: architekturę rozwiązań, wdrożenia AI i automatyzacji oraz prowadzenie projektów od POC do produkcji. [Uzupełnij: lata doświadczenia, kluczowe wdrożenia, sektory.]',
+    linkedin: 'https://www.linkedin.com/in/kamiltonkowicz/',
+    photo: '/images/people/kamil-tonkowicz.jpg',
+  },
+  {
+    name: 'Joanna Tonkowicz',
+    role: 'Partner',
+    focus: 'Ludzie, kultura organizacyjna, executive mentoring',
+    bio: 'Odpowiada za tor Leadership: rozwój liderów, mapy kompetencji CliftonStrengths i pracę nad kulturą organizacji. [Uzupełnij: certyfikacje, liczba przeprowadzonych sesji, branże.]',
+    linkedin: 'https://www.linkedin.com/in/joannatonkowicz/',
+    photo: '/images/people/joanna-tonkowicz.jpg',
+  },
 ];
