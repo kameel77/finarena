@@ -2,7 +2,7 @@ export type CaseDecision = { lead: string; why: string; rejected: string };
 export type CaseShift = { from: string; to: string };
 
 export type CaseVideo = {
-  /** H.264 MP4 (all browsers) */
+  /** H.264 MP4 (all browsers). Served via /media/case/<slug>/<variant> for byte-range support (iOS). */
   desktop: string;
   mobile: string;
   /** VP9 WebM fallback */
@@ -101,10 +101,10 @@ export const cases: CaseStudy[] = [
       'Gdy masz dobry produkt i działające kanały, ale klient odpada gdzieś między reklamą, stroną i rozmową, a nikt nie widzi całej ścieżki naraz.',
     tags: ['Next.js', 'AI extraction', 'SEO techniczne', 'Thulium', 'Agenci AI', 'Strategia marki'],
     video: {
-      desktop: '/cases/motolia/desktop.mp4',
-      mobile: '/cases/motolia/mobile.mp4',
-      desktopWebm: '/cases/motolia/desktop.webm',
-      mobileWebm: '/cases/motolia/mobile.webm',
+      desktop: '/media/case/motolia/desktop-mp4',
+      mobile: '/media/case/motolia/mobile-mp4',
+      desktopWebm: '/media/case/motolia/desktop-webm',
+      mobileWebm: '/media/case/motolia/mobile-webm',
       posterDesktop: '/cases/motolia/poster-desktop.webp',
       posterMobile: '/cases/motolia/poster-mobile.webp',
       alt: 'Nagranie ekranu motolia.pl: klient wybiera tryb na firmę, otwiera ofertę Forda Focusa, zmienia okres finansowania w kalkulatorze, a rata przelicza się na żywo. Następnie wypełnia formularz zapytania z danymi testowymi. Na końcu schemat zgłoszenia, które trafia do konsultanta razem z wybranym autem i finansowaniem.',
