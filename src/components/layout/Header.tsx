@@ -17,6 +17,7 @@ const nav = [
   { href: '/build', label: 'Build' },
   { href: '/leadership', label: 'Leadership' },
   { label: 'Sektory', children: sectors },
+  { href: '/realizacje', label: 'Realizacje' },
   { href: '/ludzie', label: 'Ludzie' },
   { href: '/kontakt', label: 'Kontakt' },
 ];

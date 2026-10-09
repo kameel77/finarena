@@ -45,8 +45,10 @@ export default function SectorPage({ params }: { params: { slug: string } }) {
 
       <Block eyebrow="Realizacje" title="Co zbudowaliśmy">
         <div className="grid sm:grid-cols-2 gap-px bg-hair border border-hair">
-          {sector.cases.map((c) => (
-            <div key={c.name} className="bg-card p-6">
+          {sector.cases.map((c) => {
+            const Tag = c.href ? Link : 'div';
+            return (
+            <Tag key={c.name} href={c.href as string} className={`bg-card p-6 block ${c.href ? 'hover:bg-paper-2 transition-colors group' : ''}`}>
               <div className="text-[17px] font-semibold mb-1.5 flex items-center gap-2">
                 <i className="w-[5px] h-[5px] rounded-full bg-accent shrink-0" />
                 {c.name}
@@ -58,8 +60,10 @@ export default function SectorPage({ params }: { params: { slug: string } }) {
                   <span key={t} className="chip">{t}</span>
                 ))}
               </div>
-            </div>
-          ))}
+              {c.href ? <span className="inline-block mt-4 text-[13px] text-accent">Zobacz case →</span> : null}
+            </Tag>
+            );
+          })}
         </div>
       </Block>
 

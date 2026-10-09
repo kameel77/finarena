@@ -6,7 +6,7 @@ export type Sector = {
   intro: string;
   problem: string;
   approach: string[];
-  cases: { name: string; note?: string; desc: string; tags: string[] }[];
+  cases: { name: string; note?: string; desc: string; tags: string[]; href?: string }[];
   metaTitle: string;
   metaDesc: string;
 };
@@ -28,7 +28,7 @@ export const sectors: Sector[] = [
       'Wdrażamy zmianę razem z zespołem handlowym, nie obok niego',
     ],
     cases: [
-      { name: 'Motolia', desc: 'Platforma dla rynku motoryzacyjnego. Automatyzuje obsługę ofert i dane pojazdów.', tags: ['Next.js', 'AI extraction', 'Integracje'] },
+      { name: 'Motolia', note: 'projekt własny', desc: 'Portal finansowania aut zaprojektowany jako jeden łańcuch: od wyboru oferty i kalkulacji raty po rozmowę z doradcą.', tags: ['Next.js', 'AI extraction', 'Integracje'], href: '/realizacje/motolia' },
       { name: 'CarSalon', desc: 'Cyfrowy proces sprzedaży w salonie: lead → wycena → finansowanie → wydanie.', tags: ['Web app', 'CRM', 'Automatyzacja'] },
     ],
     metaTitle: 'Oprogramowanie dla automotive: MVP, integracje, AI',

@@ -1,3 +1,5 @@
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
 import { Counter } from '@/components/ui/Counter';
 import { Reveal } from '@/components/ui/Reveal';
 import { stats } from '@/lib/content';
@@ -13,8 +15,11 @@ export function Stats() {
               Liczby, nie <em className="font-serif italic font-normal text-accent">deklaracje</em>.
             </h2>
             <p className="sub">
-              Docelowo w tym miejscu 2–3 case studies z wynikiem przed/po. Bez nich ta sekcja pracuje na ćwierć gwizdka.
+              Liczby mówią, ile zrobiliśmy. Realizacje pokazują, jak myślimy i jak działa to, co budujemy.
             </p>
+            <Link href="/realizacje" className="inline-flex items-center gap-2 mt-5 text-[14px] text-accent hover:text-accent-hi">
+              Zobacz realizacje <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
           </>
         </Reveal>
         <Reveal className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-hair border border-hair">

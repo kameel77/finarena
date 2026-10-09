@@ -1,0 +1,227 @@
+{
+ "viewport": {
+  "width": 1440,
+  "height": 900
+ },
+ "dpr": 2,
+ "frames": [
+  {
+   "file": "d/01_list.png",
+   "name": "list",
+   "targets": {
+    "firm": {
+     "x": 1076.5,
+     "y": 252.8,
+     "width": 97.3,
+     "height": 30.8
+    }
+   }
+  },
+  {
+   "file": "d/02_list_firm.png",
+   "name": "list_firm",
+   "targets": {
+    "card": {
+     "x": 744,
+     "y": 568.3,
+     "width": 298,
+     "height": 27.3
+    }
+   }
+  },
+  {
+   "file": "d/03_offer.png",
+   "name": "offer",
+   "targets": {
+    "firm": {
+     "x": 1186.7,
+     "y": 214.2,
+     "width": 215.3,
+     "height": 44
+    }
+   }
+  },
+  {
+   "file": "d/04_offer_firm.png",
+   "name": "offer_firm",
+   "targets": {
+    "thumb": {
+     "x": 1225.4,
+     "y": 416.2,
+     "width": 20,
+     "height": 20
+    },
+    "calc": {
+     "x": 994.3,
+     "y": 301.2,
+     "width": 384.7,
+     "height": 20
+    },
+    "rate": {
+     "x": 1126.0,
+     "y": 531.3,
+     "width": 121.4,
+     "height": 18.8
+    }
+   }
+  },
+  {
+   "file": "d/05_slide1.png",
+   "name": "slide1",
+   "targets": {
+    "thumb": {
+     "x": 1274.2,
+     "y": 416.2,
+     "width": 20,
+     "height": 20
+    },
+    "value": "72"
+   }
+  },
+  {
+   "file": "d/06_slide2.png",
+   "name": "slide2",
+   "targets": {
+    "thumb": {
+     "x": 1323.0,
+     "y": 416.2,
+     "width": 20,
+     "height": 20
+    },
+    "value": "84"
+   }
+  },
+  {
+   "file": "d/07_offer_ask.png",
+   "name": "offer_ask",
+   "targets": {
+    "ask": {
+     "x": 994.3,
+     "y": 818.1,
+     "width": 384.7,
+     "height": 48
+    }
+   }
+  },
+  {
+   "file": "d/08_form.png",
+   "name": "form",
+   "targets": {
+    "name": {
+     "x": 695,
+     "y": 484.4,
+     "width": 228,
+     "height": 48
+    },
+    "phone": {
+     "x": 695,
+     "y": 590.0,
+     "width": 228,
+     "height": 48
+    }
+   }
+  },
+  {
+   "file": "d/09_type_name0.png",
+   "name": "type_name0",
+   "targets": {
+    "name": {
+     "x": 695,
+     "y": 484.4,
+     "width": 228,
+     "height": 48
+    }
+   }
+  },
+  {
+   "file": "d/10_type_name1.png",
+   "name": "type_name1",
+   "targets": {
+    "name": {
+     "x": 695,
+     "y": 484.4,
+     "width": 228,
+     "height": 48
+    }
+   }
+  },
+  {
+   "file": "d/11_type_name2.png",
+   "name": "type_name2",
+   "targets": {
+    "name": {
+     "x": 695,
+     "y": 484.4,
+     "width": 228,
+     "height": 48
+    }
+   }
+  },
+  {
+   "file": "d/12_type_name3.png",
+   "name": "type_name3",
+   "targets": {
+    "name": {
+     "x": 695,
+     "y": 484.4,
+     "width": 228,
+     "height": 48
+    }
+   }
+  },
+  {
+   "file": "d/13_type_phone0.png",
+   "name": "type_phone0",
+   "targets": {
+    "phone": {
+     "x": 695,
+     "y": 590.0,
+     "width": 228,
+     "height": 48
+    }
+   }
+  },
+  {
+   "file": "d/14_type_phone1.png",
+   "name": "type_phone1",
+   "targets": {
+    "phone": {
+     "x": 695,
+     "y": 590.0,
+     "width": 228,
+     "height": 48
+    }
+   }
+  },
+  {
+   "file": "d/15_type_phone2.png",
+   "name": "type_phone2",
+   "targets": {
+    "phone": {
+     "x": 695,
+     "y": 590.0,
+     "width": 228,
+     "height": 48
+    }
+   }
+  },
+  {
+   "file": "d/16_form_send.png",
+   "name": "form_send",
+   "targets": {
+    "send": {
+     "x": 695,
+     "y": 426.0,
+     "width": 480,
+     "height": 48
+    },
+    "phone": {
+     "x": 695,
+     "y": -194.0,
+     "width": 228,
+     "height": 48
+    }
+   }
+  }
+ ]
+}

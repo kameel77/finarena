@@ -3,13 +3,16 @@
 import { useEffect, useRef, useState } from 'react';
 
 export function Counter({ to, suffix = '' }: { to: number; suffix?: string }) {
-  const [n, setN] = useState(0);
+  const [n, setN] = useState(to);
   const ref = useRef<HTMLSpanElement>(null);
   const done = useRef(false);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    // Already on screen at load: keep the final value, no animation.
+    if (el.getBoundingClientRect().top < window.innerHeight) return;
+    setN(0);
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
