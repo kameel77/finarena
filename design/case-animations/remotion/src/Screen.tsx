@@ -2,7 +2,8 @@ import React from "react";
 import { AbsoluteFill, Img, staticFile, useCurrentFrame } from "remotion";
 import { C, MONO, SANS, clamp01, kf } from "./theme";
 
-export type Shot = { src: string; at: number; fade?: number; url?: string };
+/** h = page height in CSS px for full-page screenshots (defaults to the viewport height). */
+export type Shot = { src: string; at: number; fade?: number; url?: string; h?: number; w?: number };
 export type Caption = { from: number; to: number; kicker: string; text: string };
 
 export type Script = {
@@ -16,6 +17,7 @@ export type Script = {
   clicks: number[];
   captions: Caption[];
   handoffAt: number;
+  bg?: string; // screen background while a frame loads
 };
 
 const ptrAt = (script: Script, f: number) => ({
@@ -33,16 +35,18 @@ export const ScreenContent: React.FC<{ script: Script; width: number; height: nu
   const rawX = kf(frame, camera.map(([t, x]) => [t, x]));
   const rawY = kf(frame, camera.map(([t, , y]) => [t, y]));
   const halfW = width / k / (2 * s);
-  const halfH = Math.min(vh / 2, height / k / (2 * s));
+  const current = [...shots].reverse().find((sh) => frame >= sh.at) ?? shots[0];
+  const pageH = current.h ?? vh;
+  const halfH = Math.min(pageH / 2, height / k / (2 * s));
   const fx = Math.min(Math.max(rawX, halfW), vw - halfW);
-  const fy = Math.min(Math.max(rawY, halfH), vh - halfH);
+  const fy = Math.min(Math.max(rawY, halfH), pageH - halfH);
 
   const p = ptrAt(script, frame);
   const pOpacity = kf(frame, script.pointerOpacity);
   const isTouch = script.device !== "browser";
 
   return (
-    <div style={{ position: "absolute", inset: 0, overflow: "hidden", background: "#fff" }}>
+    <div style={{ position: "absolute", inset: 0, overflow: "hidden", background: script.bg ?? "#fff" }}>
       <div
         style={{
           position: "absolute",
@@ -62,7 +66,7 @@ export const ScreenContent: React.FC<{ script: Script; width: number; height: nu
             <Img
               key={`${shot.src}-${i}`}
               src={staticFile(shot.src)}
-              style={{ position: "absolute", left: 0, top: 0, width: vw, height: vh, opacity }}
+              style={{ position: "absolute", left: 0, top: 0, width: shot.w ?? vw, height: shot.h ?? vh, opacity }}
             />
           );
         })}

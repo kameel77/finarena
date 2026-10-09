@@ -1,0 +1,609 @@
+{
+ "format": "printflow-catalog",
+ "version": 1,
+ "exported_at": "2026-10-09T18:27:50+00:00",
+ "source": {
+  "alembic_revision": "o6p7q8r9s0t1",
+  "app": "printflow"
+ },
+ "data": {
+  "categories": [
+   {
+    "name": "Wnętrza",
+    "description": "Druk do aranżacji wnętrz",
+    "sort_order": 0,
+    "is_active": true,
+    "external_ref": null,
+    "parent": null
+   },
+   {
+    "name": "Fototapety",
+    "description": "Fototapety na wymiar",
+    "sort_order": 0,
+    "is_active": true,
+    "external_ref": null,
+    "parent": "Wnętrza"
+   },
+   {
+    "name": "Tablice",
+    "description": "Tablice magnetyczne i kredowe",
+    "sort_order": 1,
+    "is_active": true,
+    "external_ref": null,
+    "parent": "Wnętrza"
+   },
+   {
+    "name": "Reklama",
+    "description": "Reklama wielkoformatowa",
+    "sort_order": 1,
+    "is_active": true,
+    "external_ref": null,
+    "parent": null
+   },
+   {
+    "name": "Banery",
+    "description": "Banery i siatki",
+    "sort_order": 0,
+    "is_active": true,
+    "external_ref": null,
+    "parent": "Reklama"
+   }
+  ],
+  "materials": [
+   {
+    "external_id": null,
+    "name": "Papier Lateksowy",
+    "category": "Papier",
+    "description": "Papier do druku lateksowego, różne szerokości rolek",
+    "tooltip_external_id": null,
+    "variants": [
+     {
+      "external_id": null,
+      "width_cm": "100.00",
+      "length_cm": null,
+      "weight_kg": "0.00",
+      "cost_price_per_unit": "20.00",
+      "markup_percentage": "100.00",
+      "unit": "m2",
+      "margin_w_cm": "2.00",
+      "margin_h_cm": "0.00",
+      "is_active": true,
+      "tooltip_external_id": null,
+      "tooltip_margin_w_cm": "Dodatkowy margines technologiczny po szerokości — zapas na obcinanie krawędzi.",
+      "tooltip_margin_h_cm": "Dodatkowy margines technologiczny po wysokości.",
+      "tooltip_markup_percentage": "Narzut procentowy doliczany do ceny zakupowej materiału. 100% oznacza podwojenie ceny."
+     },
+     {
+      "external_id": null,
+      "width_cm": "137.00",
+      "length_cm": null,
+      "weight_kg": "0.00",
+      "cost_price_per_unit": "28.00",
+      "markup_percentage": "100.00",
+      "unit": "m2",
+      "margin_w_cm": "2.00",
+      "margin_h_cm": "0.00",
+      "is_active": true,
+      "tooltip_external_id": null,
+      "tooltip_margin_w_cm": "Dodatkowy margines technologiczny po szerokości — zapas na obcinanie krawędzi.",
+      "tooltip_margin_h_cm": "Dodatkowy margines technologiczny po wysokości.",
+      "tooltip_markup_percentage": "Narzut procentowy doliczany do ceny zakupowej materiału. 100% oznacza podwojenie ceny."
+     }
+    ]
+   },
+   {
+    "external_id": null,
+    "name": "Folia Magnetyczna",
+    "category": "Folia",
+    "description": "Folia magnetyczna samoprzylepna",
+    "tooltip_external_id": null,
+    "variants": [
+     {
+      "external_id": null,
+      "width_cm": "140.00",
+      "length_cm": null,
+      "weight_kg": "0.00",
+      "cost_price_per_unit": "35.00",
+      "markup_percentage": "80.00",
+      "unit": "m2",
+      "margin_w_cm": "1.00",
+      "margin_h_cm": "0.00",
+      "is_active": true,
+      "tooltip_external_id": null,
+      "tooltip_margin_w_cm": "Zapas technologiczny na zawinięcie krawędzi folii.",
+      "tooltip_margin_h_cm": null,
+      "tooltip_markup_percentage": "Narzut procentowy doliczany do ceny zakupowej folii."
+     }
+    ]
+   },
+   {
+    "external_id": null,
+    "name": "Flizelina Premium",
+    "category": "Papier",
+    "description": "Flizelina pod druk lateksowy",
+    "tooltip_external_id": null,
+    "variants": [
+     {
+      "external_id": null,
+      "width_cm": "106.00",
+      "length_cm": null,
+      "weight_kg": "0.00",
+      "cost_price_per_unit": "24.00",
+      "markup_percentage": "100.00",
+      "unit": "m2",
+      "margin_w_cm": "2.00",
+      "margin_h_cm": "0.00",
+      "is_active": true,
+      "tooltip_external_id": null,
+      "tooltip_margin_w_cm": "Dodatkowy margines technologiczny po szerokości — zapas na obcinanie krawędzi.",
+      "tooltip_margin_h_cm": "Dodatkowy margines technologiczny po wysokości.",
+      "tooltip_markup_percentage": "Narzut procentowy doliczany do ceny zakupowej materiału. 100% oznacza podwojenie ceny."
+     },
+     {
+      "external_id": null,
+      "width_cm": "137.00",
+      "length_cm": null,
+      "weight_kg": "0.00",
+      "cost_price_per_unit": "30.00",
+      "markup_percentage": "100.00",
+      "unit": "m2",
+      "margin_w_cm": "2.00",
+      "margin_h_cm": "0.00",
+      "is_active": true,
+      "tooltip_external_id": null,
+      "tooltip_margin_w_cm": "Dodatkowy margines technologiczny po szerokości — zapas na obcinanie krawędzi.",
+      "tooltip_margin_h_cm": "Dodatkowy margines technologiczny po wysokości.",
+      "tooltip_markup_percentage": "Narzut procentowy doliczany do ceny zakupowej materiału. 100% oznacza podwojenie ceny."
+     },
+     {
+      "external_id": null,
+      "width_cm": "152.00",
+      "length_cm": null,
+      "weight_kg": "0.00",
+      "cost_price_per_unit": "33.00",
+      "markup_percentage": "100.00",
+      "unit": "m2",
+      "margin_w_cm": "2.00",
+      "margin_h_cm": "0.00",
+      "is_active": true,
+      "tooltip_external_id": null,
+      "tooltip_margin_w_cm": "Dodatkowy margines technologiczny po szerokości — zapas na obcinanie krawędzi.",
+      "tooltip_margin_h_cm": "Dodatkowy margines technologiczny po wysokości.",
+      "tooltip_markup_percentage": "Narzut procentowy doliczany do ceny zakupowej materiału. 100% oznacza podwojenie ceny."
+     }
+    ]
+   },
+   {
+    "external_id": null,
+    "name": "Folia Kredowa",
+    "category": "Folia",
+    "description": "Folia kredowa do tablic",
+    "tooltip_external_id": null,
+    "variants": [
+     {
+      "external_id": null,
+      "width_cm": "100.00",
+      "length_cm": null,
+      "weight_kg": "0.00",
+      "cost_price_per_unit": "38.00",
+      "markup_percentage": "100.00",
+      "unit": "m2",
+      "margin_w_cm": "2.00",
+      "margin_h_cm": "0.00",
+      "is_active": true,
+      "tooltip_external_id": null,
+      "tooltip_margin_w_cm": "Dodatkowy margines technologiczny po szerokości — zapas na obcinanie krawędzi.",
+      "tooltip_margin_h_cm": "Dodatkowy margines technologiczny po wysokości.",
+      "tooltip_markup_percentage": "Narzut procentowy doliczany do ceny zakupowej materiału. 100% oznacza podwojenie ceny."
+     },
+     {
+      "external_id": null,
+      "width_cm": "122.00",
+      "length_cm": null,
+      "weight_kg": "0.00",
+      "cost_price_per_unit": "44.00",
+      "markup_percentage": "100.00",
+      "unit": "m2",
+      "margin_w_cm": "2.00",
+      "margin_h_cm": "0.00",
+      "is_active": true,
+      "tooltip_external_id": null,
+      "tooltip_margin_w_cm": "Dodatkowy margines technologiczny po szerokości — zapas na obcinanie krawędzi.",
+      "tooltip_margin_h_cm": "Dodatkowy margines technologiczny po wysokości.",
+      "tooltip_markup_percentage": "Narzut procentowy doliczany do ceny zakupowej materiału. 100% oznacza podwojenie ceny."
+     }
+    ]
+   },
+   {
+    "external_id": null,
+    "name": "Banner Frontlit 510 g",
+    "category": "Banner",
+    "description": "Banner PVC do druku solwentowego",
+    "tooltip_external_id": null,
+    "variants": [
+     {
+      "external_id": null,
+      "width_cm": "160.00",
+      "length_cm": null,
+      "weight_kg": "0.00",
+      "cost_price_per_unit": "9.00",
+      "markup_percentage": "100.00",
+      "unit": "m2",
+      "margin_w_cm": "4.00",
+      "margin_h_cm": "0.00",
+      "is_active": true,
+      "tooltip_external_id": null,
+      "tooltip_margin_w_cm": "Dodatkowy margines technologiczny po szerokości — zapas na obcinanie krawędzi.",
+      "tooltip_margin_h_cm": "Dodatkowy margines technologiczny po wysokości.",
+      "tooltip_markup_percentage": "Narzut procentowy doliczany do ceny zakupowej materiału. 100% oznacza podwojenie ceny."
+     },
+     {
+      "external_id": null,
+      "width_cm": "250.00",
+      "length_cm": null,
+      "weight_kg": "0.00",
+      "cost_price_per_unit": "10.00",
+      "markup_percentage": "100.00",
+      "unit": "m2",
+      "margin_w_cm": "4.00",
+      "margin_h_cm": "0.00",
+      "is_active": true,
+      "tooltip_external_id": null,
+      "tooltip_margin_w_cm": "Dodatkowy margines technologiczny po szerokości — zapas na obcinanie krawędzi.",
+      "tooltip_margin_h_cm": "Dodatkowy margines technologiczny po wysokości.",
+      "tooltip_markup_percentage": "Narzut procentowy doliczany do ceny zakupowej materiału. 100% oznacza podwojenie ceny."
+     },
+     {
+      "external_id": null,
+      "width_cm": "320.00",
+      "length_cm": null,
+      "weight_kg": "0.00",
+      "cost_price_per_unit": "11.00",
+      "markup_percentage": "100.00",
+      "unit": "m2",
+      "margin_w_cm": "4.00",
+      "margin_h_cm": "0.00",
+      "is_active": true,
+      "tooltip_external_id": null,
+      "tooltip_margin_w_cm": "Dodatkowy margines technologiczny po szerokości — zapas na obcinanie krawędzi.",
+      "tooltip_margin_h_cm": "Dodatkowy margines technologiczny po wysokości.",
+      "tooltip_markup_percentage": "Narzut procentowy doliczany do ceny zakupowej materiału. 100% oznacza podwojenie ceny."
+     }
+    ]
+   }
+  ],
+  "processes": [
+   {
+    "name": "Cięcie CNC",
+    "method": "LINEAR",
+    "unit_price": "5.00",
+    "setup_fee": "10.00",
+    "internal_cost": "2.00",
+    "markup_percentage": "0.00",
+    "margin_w_cm": "0.50",
+    "margin_h_cm": "0.50",
+    "unit": "mb",
+    "is_active": true,
+    "tooltip_method": "LINEAR = obliczanie po obwodzie (mb). AREA = po powierzchni (m²). UNIT = za sztukę.",
+    "tooltip_unit_price": "Cena netto za jednostkę (mb, m², szt.) widoczna dla klienta.",
+    "tooltip_setup_fee": "Jednorazowa opłata za przygotowanie maszyny do cięcia.",
+    "tooltip_internal_cost": "Rzeczywisty koszt wewnętrzny — służy do kalkulacji marży.",
+    "tooltip_margin_w_cm": "Dodatkowy zapas na szer. potrzebny do prawidłowego cięcia.",
+    "tooltip_margin_h_cm": "Dodatkowy zapas na wys. potrzebny do prawidłowego cięcia.",
+    "labor_entries": []
+   },
+   {
+    "name": "Laminowanie",
+    "method": "AREA",
+    "unit_price": "15.00",
+    "setup_fee": "5.00",
+    "internal_cost": "8.00",
+    "markup_percentage": "0.00",
+    "margin_w_cm": "0.00",
+    "margin_h_cm": "0.00",
+    "unit": "m2",
+    "is_active": true,
+    "tooltip_method": "AREA = obliczanie po powierzchni (m²). Laminat nakładany jest na całą powierzchnię.",
+    "tooltip_unit_price": "Cena netto za m² laminacji.",
+    "tooltip_setup_fee": "Opłata za przygotowanie laminarki.",
+    "tooltip_internal_cost": "Rzeczywisty koszt folii do laminowania za m².",
+    "tooltip_margin_w_cm": null,
+    "tooltip_margin_h_cm": null,
+    "labor_entries": []
+   },
+   {
+    "name": "Druk lateksowy",
+    "method": "AREA",
+    "unit_price": "18.00",
+    "setup_fee": "0.00",
+    "internal_cost": "6.00",
+    "markup_percentage": "0.00",
+    "margin_w_cm": "0.00",
+    "margin_h_cm": "0.00",
+    "unit": "m2",
+    "is_active": true,
+    "tooltip_method": "LINEAR = obliczanie po obwodzie (mb). AREA = po powierzchni (m²). UNIT = za sztukę.",
+    "tooltip_unit_price": "Cena netto za jednostkę (mb, m², szt.) widoczna dla klienta.",
+    "tooltip_setup_fee": "Jednorazowa opłata za przygotowanie maszyny do cięcia.",
+    "tooltip_internal_cost": "Rzeczywisty koszt wewnętrzny — służy do kalkulacji marży.",
+    "tooltip_margin_w_cm": "Dodatkowy zapas na szer. potrzebny do prawidłowego cięcia.",
+    "tooltip_margin_h_cm": "Dodatkowy zapas na wys. potrzebny do prawidłowego cięcia.",
+    "labor_entries": []
+   },
+   {
+    "name": "Zgrzewanie krawędzi",
+    "method": "LINEAR",
+    "unit_price": "4.00",
+    "setup_fee": "0.00",
+    "internal_cost": "1.50",
+    "markup_percentage": "0.00",
+    "margin_w_cm": "2.00",
+    "margin_h_cm": "2.00",
+    "unit": "mb",
+    "is_active": true,
+    "tooltip_method": "LINEAR = obliczanie po obwodzie (mb). AREA = po powierzchni (m²). UNIT = za sztukę.",
+    "tooltip_unit_price": "Cena netto za jednostkę (mb, m², szt.) widoczna dla klienta.",
+    "tooltip_setup_fee": "Jednorazowa opłata za przygotowanie maszyny do cięcia.",
+    "tooltip_internal_cost": "Rzeczywisty koszt wewnętrzny — służy do kalkulacji marży.",
+    "tooltip_margin_w_cm": "Dodatkowy zapas na szer. potrzebny do prawidłowego cięcia.",
+    "tooltip_margin_h_cm": "Dodatkowy zapas na wys. potrzebny do prawidłowego cięcia.",
+    "labor_entries": []
+   },
+   {
+    "name": "Oczkowanie co 50 cm",
+    "method": "LINEAR",
+    "unit_price": "3.00",
+    "setup_fee": "0.00",
+    "internal_cost": "1.00",
+    "markup_percentage": "0.00",
+    "margin_w_cm": "0.00",
+    "margin_h_cm": "0.00",
+    "unit": "mb",
+    "is_active": true,
+    "tooltip_method": "LINEAR = obliczanie po obwodzie (mb). AREA = po powierzchni (m²). UNIT = za sztukę.",
+    "tooltip_unit_price": "Cena netto za jednostkę (mb, m², szt.) widoczna dla klienta.",
+    "tooltip_setup_fee": "Jednorazowa opłata za przygotowanie maszyny do cięcia.",
+    "tooltip_internal_cost": "Rzeczywisty koszt wewnętrzny — służy do kalkulacji marży.",
+    "tooltip_margin_w_cm": "Dodatkowy zapas na szer. potrzebny do prawidłowego cięcia.",
+    "tooltip_margin_h_cm": "Dodatkowy zapas na wys. potrzebny do prawidłowego cięcia.",
+    "labor_entries": []
+   }
+  ],
+  "cost_items": [],
+  "templates": [
+   {
+    "name": "Fototapeta na wymiar",
+    "description": "Fototapeta dzielona na brytów z zakładką",
+    "default_margin_w_cm": "0.50",
+    "default_margin_h_cm": "0.50",
+    "default_overlap_cm": "1.50",
+    "max_bryt_width_cm": "106.00",
+    "sale_price_per_m2": null,
+    "is_active": true,
+    "external_ref": null,
+    "tooltip_margin_w_cm": "Margines technologiczny po szerokości dodawany do każdego panelu fototapety.",
+    "tooltip_margin_h_cm": "Margines technologiczny po wysokości — zapas na wyrównanie górnej i dolnej krawędzi.",
+    "tooltip_overlap_cm": "Zakładka między sąsiednimi panelami. Zapobiega powstawaniu przerw po naklejeniu.",
+    "category": {
+     "name": "Fototapety",
+     "parent": "Wnętrza",
+     "external_ref": null
+    },
+    "components": [
+     {
+      "is_required": true,
+      "group_name": null,
+      "option_label": null,
+      "default_quantity_formula": null,
+      "sort_order": 0,
+      "material": {
+       "external_id": null,
+       "name": "Papier Lateksowy"
+      },
+      "process": null
+     },
+     {
+      "is_required": true,
+      "group_name": null,
+      "option_label": null,
+      "default_quantity_formula": null,
+      "sort_order": 1,
+      "material": null,
+      "process": "Druk lateksowy"
+     },
+     {
+      "is_required": false,
+      "group_name": "Wykończenie",
+      "option_label": "Laminat matowy",
+      "default_quantity_formula": null,
+      "sort_order": 2,
+      "material": null,
+      "process": "Laminowanie"
+     },
+     {
+      "is_required": true,
+      "group_name": null,
+      "option_label": null,
+      "default_quantity_formula": null,
+      "sort_order": 3,
+      "material": null,
+      "process": "Cięcie CNC"
+     }
+    ],
+    "labor_entries": [],
+    "cost_items": []
+   },
+   {
+    "name": "Tablica kredowa",
+    "description": "Tablica z folią kredową, montaż na ścianie",
+    "default_margin_w_cm": "1.00",
+    "default_margin_h_cm": "1.00",
+    "default_overlap_cm": "2.00",
+    "max_bryt_width_cm": null,
+    "sale_price_per_m2": null,
+    "is_active": true,
+    "external_ref": null,
+    "tooltip_margin_w_cm": "Margines technologiczny po szerokości dodawany do każdego panelu fototapety.",
+    "tooltip_margin_h_cm": "Margines technologiczny po wysokości — zapas na wyrównanie górnej i dolnej krawędzi.",
+    "tooltip_overlap_cm": "Zakładka między sąsiednimi panelami. Zapobiega powstawaniu przerw po naklejeniu.",
+    "category": {
+     "name": "Tablice",
+     "parent": "Wnętrza",
+     "external_ref": null
+    },
+    "components": [
+     {
+      "is_required": true,
+      "group_name": null,
+      "option_label": null,
+      "default_quantity_formula": null,
+      "sort_order": 0,
+      "material": {
+       "external_id": null,
+       "name": "Folia Kredowa"
+      },
+      "process": null
+     },
+     {
+      "is_required": true,
+      "group_name": null,
+      "option_label": null,
+      "default_quantity_formula": null,
+      "sort_order": 1,
+      "material": null,
+      "process": "Cięcie CNC"
+     }
+    ],
+    "labor_entries": [],
+    "cost_items": []
+   },
+   {
+    "name": "Tablica magnetyczna",
+    "description": "Tablica z folią magnetyczną",
+    "default_margin_w_cm": "1.00",
+    "default_margin_h_cm": "1.00",
+    "default_overlap_cm": "2.00",
+    "max_bryt_width_cm": null,
+    "sale_price_per_m2": null,
+    "is_active": true,
+    "external_ref": null,
+    "tooltip_margin_w_cm": "Margines technologiczny po szerokości dodawany do każdego panelu fototapety.",
+    "tooltip_margin_h_cm": "Margines technologiczny po wysokości — zapas na wyrównanie górnej i dolnej krawędzi.",
+    "tooltip_overlap_cm": "Zakładka między sąsiednimi panelami. Zapobiega powstawaniu przerw po naklejeniu.",
+    "category": {
+     "name": "Tablice",
+     "parent": "Wnętrza",
+     "external_ref": null
+    },
+    "components": [
+     {
+      "is_required": true,
+      "group_name": null,
+      "option_label": null,
+      "default_quantity_formula": null,
+      "sort_order": 0,
+      "material": {
+       "external_id": null,
+       "name": "Folia Magnetyczna"
+      },
+      "process": null
+     },
+     {
+      "is_required": true,
+      "group_name": null,
+      "option_label": null,
+      "default_quantity_formula": null,
+      "sort_order": 1,
+      "material": null,
+      "process": "Druk lateksowy"
+     },
+     {
+      "is_required": false,
+      "group_name": "Wykończenie",
+      "option_label": "Laminat matowy",
+      "default_quantity_formula": null,
+      "sort_order": 2,
+      "material": null,
+      "process": "Laminowanie"
+     },
+     {
+      "is_required": true,
+      "group_name": null,
+      "option_label": null,
+      "default_quantity_formula": null,
+      "sort_order": 3,
+      "material": null,
+      "process": "Cięcie CNC"
+     }
+    ],
+    "labor_entries": [],
+    "cost_items": []
+   },
+   {
+    "name": "Baner reklamowy",
+    "description": "Baner PVC ze zgrzewem i oczkami",
+    "default_margin_w_cm": "2.00",
+    "default_margin_h_cm": "2.00",
+    "default_overlap_cm": "3.00",
+    "max_bryt_width_cm": null,
+    "sale_price_per_m2": null,
+    "is_active": true,
+    "external_ref": null,
+    "tooltip_margin_w_cm": "Margines technologiczny po szerokości dodawany do każdego panelu fototapety.",
+    "tooltip_margin_h_cm": "Margines technologiczny po wysokości — zapas na wyrównanie górnej i dolnej krawędzi.",
+    "tooltip_overlap_cm": "Zakładka między sąsiednimi panelami. Zapobiega powstawaniu przerw po naklejeniu.",
+    "category": {
+     "name": "Banery",
+     "parent": "Reklama",
+     "external_ref": null
+    },
+    "components": [
+     {
+      "is_required": true,
+      "group_name": null,
+      "option_label": null,
+      "default_quantity_formula": null,
+      "sort_order": 0,
+      "material": {
+       "external_id": null,
+       "name": "Banner Frontlit 510 g"
+      },
+      "process": null
+     },
+     {
+      "is_required": true,
+      "group_name": null,
+      "option_label": null,
+      "default_quantity_formula": null,
+      "sort_order": 1,
+      "material": null,
+      "process": "Druk lateksowy"
+     },
+     {
+      "is_required": true,
+      "group_name": null,
+      "option_label": null,
+      "default_quantity_formula": null,
+      "sort_order": 2,
+      "material": null,
+      "process": "Zgrzewanie krawędzi"
+     },
+     {
+      "is_required": false,
+      "group_name": "Wykończenie",
+      "option_label": "Oczka co 50 cm",
+      "default_quantity_formula": null,
+      "sort_order": 3,
+      "material": null,
+      "process": "Oczkowanie co 50 cm"
+     }
+    ],
+    "labor_entries": [],
+    "cost_items": []
+   }
+  ],
+  "settings": {
+   "labor_rates": null
+  }
+ }
+}

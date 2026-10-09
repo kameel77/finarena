@@ -30,6 +30,8 @@ export const sectors: Sector[] = [
     cases: [
       { name: 'Motolia', note: 'projekt własny', desc: 'Portal finansowania aut zaprojektowany jako jeden łańcuch: od wyboru oferty i kalkulacji raty po rozmowę z doradcą.', tags: ['Next.js', 'AI extraction', 'Integracje'], href: '/realizacje/motolia' },
       { name: 'CarSalon', desc: 'Cyfrowy proces sprzedaży w salonie: lead → wycena → finansowanie → wydanie.', tags: ['Web app', 'CRM', 'Automatyzacja'] },
+      { name: 'IzzyCheck', note: 'projekt własny', desc: 'Ustandaryzowany raport weryfikacji pojazdu z VIN: wycena, historia szkód, niezmienny PDF i ślad audytowy.', tags: ['Integracje', 'PDF', 'Audyt'], href: '/realizacje/izzycheck' },
+      { name: 'Voicebot Motolii', note: 'projekt własny', desc: 'Rozmowa telefoniczna, która od razu staje się zgłoszeniem w Thulium, bez duplikatów i z ochroną danych.', tags: ['ElevenLabs', 'Thulium', 'Webhooki'], href: '/realizacje/voicebot' },
     ],
     metaTitle: 'Oprogramowanie dla automotive: MVP, integracje, AI',
     metaDesc:
@@ -75,7 +77,7 @@ export const sectors: Sector[] = [
     ],
     cases: [
       { name: 'Mapy kompetencji i matryce talentów', desc: 'Doradczo: sesje 1:1, mapowanie zespołów, decyzje o obsadzie ról oparte o dane.', tags: ['CliftonStrengths', 'Analytics'] },
-      { name: 'TalentPilot', note: 'produkt własny', desc: 'Osobny SaaS, który zbudowaliśmy dla siebie i wypuściliśmy na rynek. Prowadzi własną markę.', tags: ['SaaS', 'talentpilot.io'] },
+      { name: 'TalentPilot', note: 'produkt własny', desc: 'Osobny SaaS, który zbudowaliśmy dla siebie i wypuściliśmy na rynek: profile talentów, matryca zespołu, luki i zależności.', tags: ['SaaS', 'talentpilot.io'], href: '/realizacje/talentpilot' },
     ],
     metaTitle: 'HR tech i mapy kompetencji: CliftonStrengths w praktyce',
     metaDesc:

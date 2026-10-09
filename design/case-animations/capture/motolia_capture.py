@@ -1,11 +1,11 @@
 """Capture Motolia customer-journey states for the Finarena case animation.
 Never submits any form. Blurs the response-time claim (a metric)."""
-import json, os, sys
+import json, sys
 from playwright.sync_api import sync_playwright
 
 OFFER = 'https://motolia.pl/oferta/ford-focus-trend-2018-kompakt-diesel-cmq6sbah900fweweh9uaulqne'
 LIST = 'https://motolia.pl/samochody'
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'public')
+OUT = '/home/claude/work/capture'
 
 BLUR_CSS = """
 (() => { for (const el of document.querySelectorAll('*')) {
@@ -96,7 +96,7 @@ def run(mode):
         send.scroll_into_view_if_needed(); pg.wait_for_timeout(400)
         shot('form_send', {'send': box(pg, send), 'phone': box(pg, phone_in)})
         # never click send
-        json.dump(meta, open(os.path.join(os.path.dirname(OUT), 'src', f'{mode}_meta.json'), 'w'), ensure_ascii=False, indent=1)
+        json.dump(meta, open(f'{OUT}/{mode}_meta.json', 'w'), ensure_ascii=False, indent=1)
         ctx.close(); b.close()
 
 if __name__ == '__main__':

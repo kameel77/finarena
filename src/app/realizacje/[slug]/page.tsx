@@ -42,12 +42,21 @@ export default function CasePage({ params }: { params: { slug: string } }) {
           <div className="eyebrow">
             <Link href="/realizacje" className="hover:text-accent-hi">Realizacje</Link>
             <span className="text-ink-faint">·</span>
-            <Link href={`/sektory/${c.sector.slug}`} className="hover:text-accent-hi">{c.sector.label}</Link>
+            {c.sector.slug ? (
+              <Link href={`/sektory/${c.sector.slug}`} className="hover:text-accent-hi">{c.sector.label}</Link>
+            ) : (
+              <span>{c.sector.label}</span>
+            )}
           </div>
           <h1 className="text-[clamp(30px,4.2vw,54px)] mb-6 balance">{c.headline}</h1>
           <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-5 px-5 md:mx-0 md:px-0 md:flex-wrap">
             <span className="chip shrink-0 border-accent text-accent">{c.name}</span>
             {c.ownProject ? <span className="chip shrink-0">Projekt własny</span> : null}
+            {c.productUrl ? (
+              <a href={c.productUrl} target="_blank" rel="noopener" className="chip shrink-0 hover:border-accent hover:text-accent">
+                {c.productUrl.replace(/^https?:\/\//, '')} ↗
+              </a>
+            ) : null}
             {c.tags.map((t) => (
               <span key={t} className="chip shrink-0">{t}</span>
             ))}
@@ -60,7 +69,7 @@ export default function CasePage({ params }: { params: { slug: string } }) {
           <div className="wrap max-w-[1120px] animate-fade-up">
             <CaseVideo video={c.video} />
             <p className="mt-3 text-[12.5px] text-ink-faint">
-              Prawdziwe ekrany na danych testowych. Wartości i dane klientów pominięte.
+              {c.videoNote ?? 'Prawdziwe ekrany na danych testowych. Wartości i dane klientów pominięte.'}
             </p>
           </div>
         </section>
@@ -140,10 +149,16 @@ export default function CasePage({ params }: { params: { slug: string } }) {
         </div>
       </section>
 
+      {c.footnote ? (
+        <div className="wrap pt-8">
+          <p className="text-[12px] text-ink-faint max-w-[80ch]">{c.footnote}</p>
+        </div>
+      ) : null}
+
       {others.length ? (
         <Block eyebrow="Inne realizacje" title="Zobacz też">
           <div className="grid sm:grid-cols-2 gap-px bg-hair border border-hair">
-            {others.map((o) => (
+            {others.slice(0, 4).map((o) => (
               <Link key={o.slug} href={`/realizacje/${o.slug}`} className="bg-card p-6 hover:bg-paper-2 transition-colors">
                 <div className="text-[18px] font-semibold mb-1">{o.name}</div>
                 <div className="text-[13.5px] text-ink-mute mb-3">{o.headline}</div>
