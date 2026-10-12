@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
+import { triggerHaptic } from '@/lib/haptics';
 
 export type SpotlightShape = 'circle' | 'beam';
 
@@ -245,6 +246,9 @@ const SpotlightCard = ({
       pointer.y = event.clientY;
       pointer.active = true;
       state.pressed = true;
+      if (event.pointerType !== 'mouse') {
+        triggerHaptic('light');
+      }
       wake();
     };
     const onUp = (event: PointerEvent) => {

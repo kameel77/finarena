@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, ChevronDown, Menu, X } from 'lucide-react';
+import { triggerHaptic } from '@/lib/haptics';
 
 const sectors = [
   { href: '/sektory/automotive', label: 'Automotive', hint: 'Motolia · CarSalon' },
@@ -86,7 +87,14 @@ export function Header() {
           Porozmawiajmy <ArrowRight className="w-3.5 h-3.5" />
         </Link>
 
-        <button className="lg:hidden p-2" onClick={() => setOpen(!open)} aria-label="Menu">
+        <button
+          className="lg:hidden p-2 rounded focus:outline-none"
+          onClick={() => {
+            triggerHaptic('light');
+            setOpen(!open);
+          }}
+          aria-label="Menu"
+        >
           {open ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>

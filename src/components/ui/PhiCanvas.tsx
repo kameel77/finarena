@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { triggerHaptic } from '@/lib/haptics';
 
 type Pt = { x: number; y: number };
 const PHI = 1.618034;
-const N = 1100;
 const LABELS = ['Chaos', 'Struktura', 'Proporcja Φ', 'Skala'];
 
 function goldenSquares() {
@@ -24,16 +24,16 @@ function goldenSquares() {
 const SQ = goldenSquares();
 const YOFF = (1 - 1 / PHI) / 2;
 
-const chaos = (): Pt[] => Array.from({ length: N }, () => ({ x: Math.random(), y: Math.random() }));
+const chaos = (n: number): Pt[] => Array.from({ length: n }, () => ({ x: Math.random(), y: Math.random() }));
 
-function lattice(): Pt[] {
+function lattice(n: number): Pt[] {
   const per = SQ.map((s) => s.w * 4);
   const tot = per.reduce((a, b) => a + b, 0);
   const a: Pt[] = [];
   SQ.forEach((s, i) => {
-    const n = Math.max(8, Math.round((N * per[i]) / tot));
-    for (let k = 0; k < n; k++) {
-      const t = (k / n) * 4, e = Math.floor(t), f = t - e;
+    const kCount = Math.max(8, Math.round((n * per[i]) / tot));
+    for (let k = 0; k < kCount; k++) {
+      const t = (k / kCount) * 4, e = Math.floor(t), f = t - e;
       let X: number, Y: number;
       if (e === 0) { X = s.x + f * s.w; Y = s.y; }
       else if (e === 1) { X = s.x + s.w; Y = s.y + f * s.h; }
@@ -42,26 +42,21 @@ function lattice(): Pt[] {
       a.push({ x: X, y: Y + YOFF });
     }
   });
-  while (a.length < N) a.push(a[Math.floor(Math.random() * a.length)]);
-  return a.slice(0, N);
+  while (a.length < n) a.push(a[Math.floor(Math.random() * a.length)]);
+  return a.slice(0, n);
 }
 
-function spiral(): Pt[] {
-  return Array.from({ length: N }, (_, i) => {
-    const th = (i / N) * Math.PI * 4.6;
+function spiral(n: number): Pt[] {
+  return Array.from({ length: n }, (_, i) => {
+    const th = (i / n) * Math.PI * 4.6;
     const r = 0.012 * Math.pow(PHI, (th * 2) / Math.PI);
     const j = (Math.random() - 0.5) * 0.012;
     return { x: 0.5 + Math.cos(th) * r * 0.62 + j, y: 0.5 + Math.sin(th) * r * 0.62 + j };
   });
 }
 
-/**
- * Canvas nie rozwija zmiennych CSS w ctx.font, więc `var(--font-serif)` daje
- * nieprawidłowy ciąg, przypisanie jest ignorowane i zostaje domyślne
- * 10px sans-serif, przez co glif renderuje się jako punkcik. Rodzinę
- * trzeba odczytać z computed style i wstawić dosłownie.
- */
 function serifFamily(): string {
+  if (typeof window === 'undefined') return 'Georgia, "Times New Roman", serif';
   const v = getComputedStyle(document.documentElement).getPropertyValue('--font-serif').trim();
   return v ? `${v}, Georgia, serif` : 'Georgia, "Times New Roman", serif';
 }
@@ -85,13 +80,12 @@ function samplePool(family: string, n: number): Pt[] {
   return pool;
 }
 
-function glyph(): Pt[] {
-  const n = 170;
-  let pool = samplePool(serifFamily(), n);
-  // Za mała próbka = font się nie załadował albo nie ma glifu Φ, bierzemy generyczny serif.
-  if (pool.length < 250) pool = samplePool('Georgia, "Times New Roman", serif', n);
-  if (pool.length < 100) return spiral();
-  return Array.from({ length: N }, () => {
+function glyph(n: number): Pt[] {
+  const sampleSize = 170;
+  let pool = samplePool(serifFamily(), sampleSize);
+  if (pool.length < 250) pool = samplePool('Georgia, "Times New Roman", serif', sampleSize);
+  if (pool.length < 100) return spiral(n);
+  return Array.from({ length: n }, () => {
     const p = pool[Math.floor(Math.random() * pool.length)];
     return { x: p.x + (Math.random() - 0.5) * 0.006, y: p.y + (Math.random() - 0.5) * 0.006 };
   });
@@ -109,17 +103,18 @@ export function PhiCanvas() {
     if (!g) return;
 
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isMobile = window.innerWidth < 640;
+    const N = isMobile ? 420 : 1100;
     const INK = '20,24,27', ACC = '194,74,38';
     const DPR = Math.min(window.devicePixelRatio || 1, 2);
     let W = 0, H = 0, S = 0, OX = 0, OY = 0, raf = 0;
     const mouse = { x: -9e9, y: -9e9 };
 
-    const T: Pt[][] = [chaos(), lattice(), chaos(), spiral()];
+    const T: Pt[][] = [chaos(N), lattice(N), chaos(N), spiral(N)];
     let fontTimer: number | undefined;
-    const buildGlyph = () => { T[2] = glyph(); };
+    const buildGlyph = () => { T[2] = glyph(N); };
     if (document.fonts) {
       document.fonts.ready.then(buildGlyph);
-      // Safari potrafi rozstrzygnąć fonts.ready przed podmianą webfontu.
       fontTimer = window.setTimeout(buildGlyph, 1200);
     } else {
       buildGlyph();
@@ -208,6 +203,19 @@ export function PhiCanvas() {
     const onLeave = () => { mouse.x = mouse.y = -9e9; };
     const onClick = () => { if (prog >= 1) { prog = 0; state = next; next = (next + 1) % 4; hold = 0; } };
 
+    const onTouchMove = (e: TouchEvent) => {
+      if (!e.touches[0]) return;
+      const r = cv.getBoundingClientRect();
+      mouse.x = e.touches[0].clientX - r.left;
+      mouse.y = e.touches[0].clientY - r.top;
+    };
+    const onTouchStart = (e: TouchEvent) => {
+      if (!e.touches[0]) return;
+      const r = cv.getBoundingClientRect();
+      mouse.x = e.touches[0].clientX - r.left;
+      mouse.y = e.touches[0].clientY - r.top;
+    };
+
     (cv as HTMLCanvasElement & { triggerState?: (target: number) => void }).triggerState = (target: number) => {
       prog = 0;
       state = target;
@@ -220,6 +228,10 @@ export function PhiCanvas() {
     cv.addEventListener('mousemove', onMove);
     cv.addEventListener('mouseleave', onLeave);
     cv.addEventListener('click', onClick);
+    cv.addEventListener('touchstart', onTouchStart, { passive: true });
+    cv.addEventListener('touchmove', onTouchMove, { passive: true });
+    cv.addEventListener('touchend', onLeave);
+
     if (reduce) { prog = 1; state = 2; frame(); cancelAnimationFrame(raf); } else frame();
 
     return () => {
@@ -229,10 +241,14 @@ export function PhiCanvas() {
       cv.removeEventListener('mousemove', onMove);
       cv.removeEventListener('mouseleave', onLeave);
       cv.removeEventListener('click', onClick);
+      cv.removeEventListener('touchstart', onTouchStart);
+      cv.removeEventListener('touchmove', onTouchMove);
+      cv.removeEventListener('touchend', onLeave);
     };
   }, []);
 
   const switchState = (idx: number) => {
+    triggerHaptic('light');
     const cv = ref.current as HTMLCanvasElement & { triggerState?: (target: number) => void };
     if (cv?.triggerState) {
       cv.triggerState(idx);
@@ -241,15 +257,15 @@ export function PhiCanvas() {
 
   return (
     <figure className="relative w-full m-0 aspect-[1/1.12] group">
-      <div className="absolute top-3 right-3 z-20 flex gap-1 bg-card/80 backdrop-blur-sm p-1 rounded border border-hair-strong">
+      <div className="absolute top-3 right-3 z-20 flex gap-1 bg-card/85 backdrop-blur-md p-1 rounded border border-hair-strong shadow-sm max-w-[calc(100%-24px)] overflow-x-auto scrollbar-none">
         {LABELS.map((l, i) => (
           <button
             key={l}
             type="button"
             onClick={() => switchState(i)}
-            className={`font-mono text-[9px] uppercase px-1.5 py-0.5 rounded transition-all ${
+            className={`font-mono text-[9.5px] sm:text-[9px] uppercase px-2 py-1 sm:px-1.5 sm:py-0.5 rounded transition-all shrink-0 active:scale-95 ${
               label === l
-                ? 'bg-ink text-paper font-medium'
+                ? 'bg-ink text-paper font-medium shadow-xs'
                 : 'text-ink-mute hover:text-ink hover:bg-paper-2'
             }`}
           >
@@ -257,7 +273,12 @@ export function PhiCanvas() {
           </button>
         ))}
       </div>
-      <canvas ref={ref} className="w-full h-full block cursor-crosshair" aria-hidden />
+      <canvas
+        ref={ref}
+        className="w-full h-full block cursor-crosshair touch-pan-y"
+        style={{ touchAction: 'pan-y' }}
+        aria-hidden
+      />
       <figcaption className="absolute left-0 bottom-0 w-full flex items-center gap-3.5">
         <span className="kicker text-ink-mute min-w-[132px]">{label}</span>
         <span className="flex-1 h-px bg-hair-strong relative overflow-hidden">
