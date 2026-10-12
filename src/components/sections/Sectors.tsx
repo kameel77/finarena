@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Reveal } from '@/components/ui/Reveal';
 import { otherSector, sectors } from '@/lib/content';
+import SpotlightCard from '@/components/react-bits/SpotlightCard/SpotlightCard';
 
 const tabs = [
   ...sectors.map((s) => ({ label: s.label, hint: s.hint, href: `/sektory/${s.slug}` })),
@@ -25,7 +26,7 @@ export function Sectors() {
         <Reveal className="max-w-[58ch] mb-14">
           <>
             <div className="eyebrow">Obszary działania</div>
-            <h2 className="text-[clamp(30px,3.7vw,46px)] mb-4">
+            <h2 className="text-[clamp(30px,3.7vw,46px)] mb-4 font-medium tracking-tight">
               Te branże znamy naprawdę dobrze. W kolejne wchodzimy{' '}
               <em className="font-serif italic font-normal text-accent">tą samą metodą</em>.
             </h2>
@@ -38,7 +39,7 @@ export function Sectors() {
           </>
         </Reveal>
 
-        <Reveal className="grid lg:grid-cols-[0.85fr_1.618fr] border border-hair bg-card rounded overflow-hidden">
+        <Reveal className="grid lg:grid-cols-[0.85fr_1.618fr] border border-hair bg-card rounded overflow-hidden shadow-sm">
           <>
             <div className="flex lg:block overflow-x-auto bg-paper-2 lg:border-r border-hair">
               {tabs.map((t, i) => (
@@ -60,32 +61,47 @@ export function Sectors() {
               ))}
             </div>
 
-            <div key={active} className="p-7 md:p-11 animate-panel-in">
-              <h3 className="text-[27px] mb-3">{panel.title}</h3>
-              <p className="text-[15.5px] text-ink-soft max-w-[56ch]">{panel.intro}</p>
+            <div key={active} className="p-7 md:p-11 animate-panel-in flex flex-col justify-between">
+              <div>
+                <h3 className="text-[27px] font-medium tracking-tight mb-3">{panel.title}</h3>
+                <p className="text-[15.5px] text-ink-soft max-w-[56ch] leading-relaxed">{panel.intro}</p>
 
-              <div className="grid sm:grid-cols-2 gap-px bg-hair border border-hair mt-8">
-                {panel.cases.map((c) => (
-                  <div key={c.name} className="bg-card p-5 transition-colors hover:bg-paper-2">
-                    <div className="text-[15px] font-semibold mb-1.5 flex items-center gap-2">
-                      <i className="w-[5px] h-[5px] rounded-full bg-accent shrink-0" />
-                      {c.name}
-                      {(c as { note?: string }).note ? (
-                        <span className="text-[10px] text-ink-faint font-normal">· {(c as { note?: string }).note}</span>
-                      ) : null}
-                    </div>
-                    <div className="text-[13px] text-ink-mute leading-relaxed">{c.desc}</div>
-                    <div className="flex gap-1.5 flex-wrap mt-3.5">
-                      {c.tags.map((t) => (
-                        <span key={t} className="chip">{t}</span>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+                <div className="grid sm:grid-cols-2 gap-3.5 mt-8">
+                  {panel.cases.map((c) => (
+                    <SpotlightCard
+                      key={c.name}
+                      theme="light"
+                      spotlightColor="rgba(194, 74, 38, 0.14)"
+                      intensity={0.5}
+                      className="!bg-card !border-hair rounded p-5 flex flex-col justify-between transition-all duration-300 hover:shadow-md hover:border-ink/20"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between gap-2 mb-2">
+                          <div className="text-[15px] font-semibold flex items-center gap-2 text-ink">
+                            <span className="w-1.5 h-1.5 rounded-full bg-accent shrink-0" />
+                            {c.name}
+                          </div>
+                          {(c as { note?: string }).note ? (
+                            <span className="font-mono text-[9.5px] text-accent px-1.5 py-0.5 rounded bg-accent-soft border border-accent/20">
+                              {(c as { note?: string }).note}
+                            </span>
+                          ) : null}
+                        </div>
+                        <div className="text-[13px] text-ink-mute leading-relaxed">{c.desc}</div>
+                      </div>
+                      <div className="flex gap-1.5 flex-wrap mt-4 pt-3 border-t border-hair/60">
+                        {c.tags.map((t) => (
+                          <span key={t} className="chip bg-paper-2/60">{t}</span>
+                        ))}
+                      </div>
+                    </SpotlightCard>
+                  ))}
+                </div>
               </div>
 
-              <Link href={panel.href} className="inline-flex items-center gap-2 mt-7 text-[13.5px] font-medium text-accent hover:text-accent-hi transition-colors">
-                {active < sectors.length ? 'Zobacz szczegóły sektora' : 'Porozmawiajmy o Twojej branży'} →
+              <Link href={panel.href} className="inline-flex items-center gap-2 mt-8 text-[13.5px] font-medium text-accent hover:text-accent-hi transition-colors group">
+                {active < sectors.length ? 'Zobacz szczegóły sektora' : 'Porozmawiajmy o Twojej branży'}
+                <span className="transition-transform group-hover:translate-x-1">→</span>
               </Link>
             </div>
           </>

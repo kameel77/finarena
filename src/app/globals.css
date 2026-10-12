@@ -3,7 +3,12 @@
 @tailwind utilities;
 
 @layer base {
-  html { scroll-behavior: smooth; }
+  html.lenis, html.lenis body {
+    height: auto;
+  }
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
   body {
     @apply bg-paper text-ink font-sans antialiased;
     line-height: 1.55;

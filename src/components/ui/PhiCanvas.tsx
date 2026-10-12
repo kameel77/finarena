@@ -115,11 +115,12 @@ export function PhiCanvas() {
     const mouse = { x: -9e9, y: -9e9 };
 
     const T: Pt[][] = [chaos(), lattice(), chaos(), spiral()];
+    let fontTimer: number | undefined;
     const buildGlyph = () => { T[2] = glyph(); };
     if (document.fonts) {
       document.fonts.ready.then(buildGlyph);
       // Safari potrafi rozstrzygnąć fonts.ready przed podmianą webfontu.
-      window.setTimeout(buildGlyph, 1200);
+      fontTimer = window.setTimeout(buildGlyph, 1200);
     } else {
       buildGlyph();
     }
@@ -207,6 +208,13 @@ export function PhiCanvas() {
     const onLeave = () => { mouse.x = mouse.y = -9e9; };
     const onClick = () => { if (prog >= 1) { prog = 0; state = next; next = (next + 1) % 4; hold = 0; } };
 
+    (cv as HTMLCanvasElement & { triggerState?: (target: number) => void }).triggerState = (target: number) => {
+      prog = 0;
+      state = target;
+      next = (target + 1) % 4;
+      hold = 0;
+    };
+
     fit();
     window.addEventListener('resize', fit);
     cv.addEventListener('mousemove', onMove);
@@ -216,6 +224,7 @@ export function PhiCanvas() {
 
     return () => {
       cancelAnimationFrame(raf);
+      if (fontTimer) clearTimeout(fontTimer);
       window.removeEventListener('resize', fit);
       cv.removeEventListener('mousemove', onMove);
       cv.removeEventListener('mouseleave', onLeave);
@@ -223,8 +232,31 @@ export function PhiCanvas() {
     };
   }, []);
 
+  const switchState = (idx: number) => {
+    const cv = ref.current as HTMLCanvasElement & { triggerState?: (target: number) => void };
+    if (cv?.triggerState) {
+      cv.triggerState(idx);
+    }
+  };
+
   return (
-    <figure className="relative w-full m-0 aspect-[1/1.12]">
+    <figure className="relative w-full m-0 aspect-[1/1.12] group">
+      <div className="absolute top-3 right-3 z-20 flex gap-1 bg-card/80 backdrop-blur-sm p-1 rounded border border-hair-strong">
+        {LABELS.map((l, i) => (
+          <button
+            key={l}
+            type="button"
+            onClick={() => switchState(i)}
+            className={`font-mono text-[9px] uppercase px-1.5 py-0.5 rounded transition-all ${
+              label === l
+                ? 'bg-ink text-paper font-medium'
+                : 'text-ink-mute hover:text-ink hover:bg-paper-2'
+            }`}
+          >
+            0{i + 1} {l.split(' ')[0]}
+          </button>
+        ))}
+      </div>
       <canvas ref={ref} className="w-full h-full block cursor-crosshair" aria-hidden />
       <figcaption className="absolute left-0 bottom-0 w-full flex items-center gap-3.5">
         <span className="kicker text-ink-mute min-w-[132px]">{label}</span>

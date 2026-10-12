@@ -1,6 +1,7 @@
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Code2, Users2, Sparkles, CheckCircle2 } from 'lucide-react';
 import { Reveal } from '@/components/ui/Reveal';
+import SpotlightCard from '@/components/react-bits/SpotlightCard/SpotlightCard';
 
 const build = [
   'Produkty i platformy: POC → MVP → produkcja → run',
@@ -34,49 +35,87 @@ export function Paths() {
           </>
         </Reveal>
 
-        <Reveal className="grid lg:grid-cols-2 gap-5">
+        <Reveal className="grid lg:grid-cols-2 gap-6">
           <>
-            <div className="bg-ink text-paper border border-ink rounded p-8 md:p-11 flex flex-col transition-transform duration-300 hover:-translate-y-1">
-              <div className="kicker text-white/45 mb-5">Tor 1 · dla CTO, COO, foundera</div>
-              <h3 className="text-[30px] mb-1.5">Finarena Build</h3>
-              <div className="text-accent-hi text-[13.5px] font-medium mb-4">Studio produktowe w wertykałach</div>
-              <p className="text-[15px] text-white/70 mb-6 max-w-[44ch]">
-                Budujemy oprogramowanie produkcyjne, od POC po pełne wdrożenie i utrzymanie. Nie „projekt”, tylko
-                sekwencja odwracalnych decyzji, w której każdy etap kończy się czymś działającym.
-              </p>
-              <ul className="mb-7 flex-1">
-                {build.map((t, i) => (
-                  <li key={t} className="flex gap-3 items-baseline text-[14.5px] text-white/80 py-2.5 border-b border-white/10 last:border-0">
-                    <b className="font-mono text-[9.5px] text-white/35 font-normal">0{i + 1}</b>
-                    {t}
-                  </li>
-                ))}
-              </ul>
-              <Link href="/build" className="btn-ghost-dark self-start">
-                Zobacz, jak pracujemy <ArrowRight className="w-3.5 h-3.5" />
+            <SpotlightCard
+              theme="dark"
+              spotlightColor="rgba(224, 92, 49, 0.25)"
+              intensity={0.7}
+              shape="circle"
+              className="!bg-ink text-paper !border-white/10 rounded p-8 md:p-11 flex flex-col justify-between transition-transform duration-300 hover:-translate-y-1"
+            >
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-5">
+                  <div className="kicker text-white/45 flex items-center gap-2">
+                    <Code2 className="w-3.5 h-3.5 text-accent-hi" />
+                    Tor 1 · dla CTO, COO, foundera
+                  </div>
+                  <span className="font-mono text-[9.5px] uppercase tracking-wider px-2 py-0.5 rounded bg-white/10 text-white/70 border border-white/10">
+                    Studio Produktowe
+                  </span>
+                </div>
+                <h3 className="text-[30px] mb-1.5 font-medium tracking-tight">Finarena Build</h3>
+                <div className="text-accent-hi text-[13.5px] font-medium mb-4 flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  Wdrożenia w wertykałach & AI
+                </div>
+                <p className="text-[15px] text-white/70 mb-6 max-w-[44ch] leading-relaxed">
+                  Budujemy oprogramowanie produkcyjne, od POC po pełne wdrożenie i utrzymanie. Nie „projekt”, tylko
+                  sekwencja odwracalnych decyzji, w której każdy etap kończy się czymś działającym.
+                </p>
+                <ul className="mb-7">
+                  {build.map((t, i) => (
+                    <li key={t} className="flex gap-3 items-baseline text-[14.5px] text-white/80 py-2.5 border-b border-white/10 last:border-0">
+                      <b className="font-mono text-[9.5px] text-accent-hi font-medium">0{i + 1}</b>
+                      {t}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <Link href="/build" className="btn-ghost-dark self-start mt-4 group">
+                Zobacz, jak pracujemy <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
               </Link>
-            </div>
+            </SpotlightCard>
 
-            <div className="bg-card border border-hair rounded p-8 md:p-11 flex flex-col transition-all duration-300 hover:-translate-y-1 hover:border-ink hover:shadow-lift">
-              <div className="kicker text-ink-faint mb-5">Tor 2 · dla CEO, właściciela, zarządu</div>
-              <h3 className="text-[30px] mb-1.5">Finarena Leadership</h3>
-              <div className="text-accent text-[13.5px] font-medium mb-4">Butik doradczy · praca z ludźmi</div>
-              <p className="text-[15px] text-ink-soft mb-6 max-w-[44ch]">
-                Pracujemy z osobami, które podejmują decyzje, i z zespołami, które je wykonują. Certyfikowana metodyka,
-                mierzalny efekt, brak korporacyjnych warsztatów bez konsekwencji.
-              </p>
-              <ul className="mb-7 flex-1">
-                {lead.map((t, i) => (
-                  <li key={t} className="flex gap-3 items-baseline text-[14.5px] text-ink-soft py-2.5 border-b border-hair last:border-0">
-                    <b className="font-mono text-[9.5px] text-ink-faint font-normal">0{i + 1}</b>
-                    {t}
-                  </li>
-                ))}
-              </ul>
-              <Link href="/leadership" className="btn-ghost self-start">
-                Poznaj ludzi, z którymi pracujesz <ArrowRight className="w-3.5 h-3.5" />
+            <SpotlightCard
+              theme="light"
+              spotlightColor="rgba(194, 74, 38, 0.15)"
+              intensity={0.6}
+              shape="circle"
+              className="!bg-card !border-hair rounded p-8 md:p-11 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:border-ink hover:shadow-lift"
+            >
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-5">
+                  <div className="kicker text-ink-faint flex items-center gap-2">
+                    <Users2 className="w-3.5 h-3.5 text-accent" />
+                    Tor 2 · dla CEO, właściciela, zarządu
+                  </div>
+                  <span className="font-mono text-[9.5px] uppercase tracking-wider px-2 py-0.5 rounded bg-accent-soft text-accent border border-accent/20">
+                    Certyfikat Gallup
+                  </span>
+                </div>
+                <h3 className="text-[30px] mb-1.5 font-medium tracking-tight">Finarena Leadership</h3>
+                <div className="text-accent text-[13.5px] font-medium mb-4 flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  Butik doradczy · praca z ludźmi
+                </div>
+                <p className="text-[15px] text-ink-soft mb-6 max-w-[44ch] leading-relaxed">
+                  Pracujemy z osobami, które podejmują decyzje, i z zespołami, które je wykonują. Certyfikowana metodyka,
+                  mierzalny efekt, brak korporacyjnych warsztatów bez konsekwencji.
+                </p>
+                <ul className="mb-7">
+                  {lead.map((t, i) => (
+                    <li key={t} className="flex gap-3 items-baseline text-[14.5px] text-ink-soft py-2.5 border-b border-hair last:border-0">
+                      <b className="font-mono text-[9.5px] text-accent font-medium">0{i + 1}</b>
+                      {t}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <Link href="/leadership" className="btn-ghost self-start mt-4 group">
+                Poznaj ludzi, z którymi pracujesz <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
               </Link>
-            </div>
+            </SpotlightCard>
           </>
         </Reveal>
       </div>
