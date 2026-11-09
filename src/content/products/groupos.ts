@@ -1,12 +1,12 @@
 import type { ProductConfig } from './types';
 
 /**
- * Placeholder link do kalendarza rezerwacji rozmowy (Cal.com / Calendly).
- * Docelowy adres zostanie podmieniony przez właściciela produktu (Kamila).
+ * Opcjonalny link do kalendarza rezerwacji rozmowy (Cal.com / Calendly).
+ * Domyślnie undefined — gdy niezdefiniowany, przycisk rezerwacji jest ukryty,
+ * a wszystkie CTA prowadzą bezpośrednio do dedykowanego formularza kontaktowego.
  */
 export const DEMO_BOOKING_URL =
-  process.env.NEXT_PUBLIC_GROUPOS_DEMO_BOOKING_URL ||
-  'https://cal.com/finarena/groupos-demo';
+  process.env.NEXT_PUBLIC_GROUPOS_DEMO_BOOKING_URL || undefined;
 
 export const grouposProduct: ProductConfig = {
   slug: 'groupos',
@@ -88,8 +88,9 @@ export const grouposProduct: ProductConfig = {
       {
         name: 'East Gate Group',
         label: 'East Gate Group',
-        role: 'Wdrożenie dedykowane (logo — placeholder do podmiany po dostarczeniu assetu)',
-        logoSvg: 'east-gate-placeholder',
+        role: 'Wdrożenie dedykowane dla grupy kapitałowej',
+        logoSvg: 'east-gate',
+        logoPath: '/products/groupos/egg-wordmark.svg',
       },
     ],
   },

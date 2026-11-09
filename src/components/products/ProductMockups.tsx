@@ -20,17 +20,38 @@ import {
   UserCheck,
 } from 'lucide-react';
 
+export interface StoryStep {
+  id: string;
+  label: string;
+  narrative: string;
+}
+
 /**
- * Hook uruchamiający spokojną pętlę animacji (8–12 s) po wejściu w viewport,
- * z pełnym poszanowaniem `prefers-reduced-motion: reduce` (statyczny stan końcowy).
+ * Hook zarządzający narracyjną pętlą animacji makiety (4–5 s na krok):
+ * - Historia „akcja → skutek” z 1-zdaniowym podpisem i płynnym paskiem postępu
+ * - Pauza po najechaniu myszą (hover)
+ * - Pauza po kliknięciu ręcznym (manualOverride) z automatycznym wznowieniem po 8 s bez interakcji
+ * - Pełne poszanowanie `prefers-reduced-motion: reduce` (statyczny stan końcowy/początkowy)
+ * - Uruchamia się wyłącznie po wejściu w viewport (IntersectionObserver)
  */
-export function useViewportLoop(stepsCount: number, intervalMs = 2500, defaultReducedStep = 0) {
+export function useStoryLoop({
+  steps,
+  stepDurationMs = 4500,
+  defaultReducedStep = 0,
+}: {
+  steps: StoryStep[];
+  stepDurationMs?: number;
+  defaultReducedStep?: number;
+}) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [step, setStep] = useState<number>(defaultReducedStep);
   const [inView, setInView] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
-  const [manualOverride, setManualOverride] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [progress, setProgress] = useState(0); // 0 to 100
+  const resumeTimerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // prefers-reduced-motion
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -38,6 +59,7 @@ export function useViewportLoop(stepsCount: number, intervalMs = 2500, defaultRe
       setReducedMotion(mq.matches);
       if (mq.matches) {
         setStep(defaultReducedStep);
+        setProgress(100);
       }
     };
     updateMotion();
@@ -45,6 +67,7 @@ export function useViewportLoop(stepsCount: number, intervalMs = 2500, defaultRe
     return () => mq.removeEventListener('change', updateMotion);
   }, [defaultReducedStep]);
 
+  // IntersectionObserver
   useEffect(() => {
     const el = containerRef.current;
     if (!el || typeof IntersectionObserver === 'undefined') {
@@ -57,169 +80,298 @@ export function useViewportLoop(stepsCount: number, intervalMs = 2500, defaultRe
           setInView(entry.isIntersecting);
         }
       },
-      { threshold: 0.2 }
+      { threshold: 0.15 }
     );
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
 
+  // Timer loop & progress bar ticker
   useEffect(() => {
-    if (reducedMotion || !inView || manualOverride) return;
-    const timer = window.setInterval(() => {
-      setStep((prev) => (prev + 1) % stepsCount);
-    }, intervalMs);
-    return () => window.clearInterval(timer);
-  }, [reducedMotion, inView, manualOverride, stepsCount, intervalMs]);
+    if (reducedMotion || !inView || isPaused) return;
 
-  const selectStepManually = (nextStep: number) => {
-    setManualOverride(true);
-    setStep(nextStep);
+    const intervalMs = 50;
+    const increment = (intervalMs / stepDurationMs) * 100;
+
+    const timer = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          setStep((cur) => (cur + 1) % steps.length);
+          return 0;
+        }
+        return prev + increment;
+      });
+    }, intervalMs);
+
+    return () => clearInterval(timer);
+  }, [reducedMotion, inView, isPaused, stepDurationMs, steps.length]);
+
+  // Ręczny wybór kroku: pauzuje i wznawia po 8 s braku interakcji
+  const selectStep = (index: number) => {
+    setStep(index);
+    setProgress(0);
+    setIsPaused(true);
+
+    if (resumeTimerRef.current) {
+      clearTimeout(resumeTimerRef.current);
+    }
+    resumeTimerRef.current = setTimeout(() => {
+      setIsPaused(false);
+      resumeTimerRef.current = null;
+    }, 8000);
   };
 
-  return { containerRef, step, reducedMotion, selectStepManually };
+  const onMouseEnter = () => {
+    if (!reducedMotion) setIsPaused(true);
+  };
+
+  const onMouseLeave = () => {
+    if (!reducedMotion && !resumeTimerRef.current) {
+      setIsPaused(false);
+    }
+  };
+
+  return {
+    containerRef,
+    step,
+    currentStepData: steps[step] || steps[0],
+    progress: reducedMotion ? 100 : Math.min(progress, 100),
+    isPaused,
+    reducedMotion,
+    selectStep,
+    onMouseEnter,
+    onMouseLeave,
+  };
 }
 
-const M1_ENTITIES = [
-  {
-    id: 'group',
-    name: 'Grupa — wszystkie',
-    dot: '#4F6BFF',
-    dealsCount: '20 aktywnych',
-    dealsSub: '3 z nich wymagają uwagi',
-    projectsCount: '14 w realizacji',
-    projectsSub: '3 spółki operacyjne',
-    overdueCount: '2 po terminie',
-    overdueSub: '1 w Aurora · 1 w Velo',
-    risksCount: '3 otwarte ryzyka',
-    risksSub: 'Każde ma właściciela',
-    contractsCount: '3 wygasają w 30 dni',
-    contractsSub: 'Alerty terminów aktywne',
-    items: [
-      {
-        id: 'CTR-018',
-        title: 'Umowa najmu magazynu centralnego wygasa za 30 dni',
-        entity: 'Nord Events sp. z o.o.',
-        meta: 'Rejestr umów · Alert 30 dni',
-        tone: 'amber',
-      },
-      {
-        id: 'RSK-012',
-        title: 'Ryzyko opóźnienia dostawy rozdzielnicy SN — etap II',
-        entity: 'Aurora Energy sp. z o.o.',
-        meta: 'Rejestr ryzyk · Wysoki priorytet',
-        tone: 'red',
-      },
-      {
-        id: 'CRM-204',
-        title: 'Wymaga uwagi: brak kontaktu 21 dni (Solaris Grid)',
-        entity: 'Aurora Energy sp. z o.o.',
-        meta: 'CRM · Wymagany następny krok',
-        tone: 'blue',
-      },
-    ],
-  },
-  {
-    id: 'aurora',
-    name: 'Aurora Energy sp. z o.o.',
-    dot: '#38BDF8',
-    dealsCount: '9 aktywnych',
-    dealsSub: '1 wymaga uwagi',
-    projectsCount: '6 w realizacji',
-    projectsSub: 'Energetyka i OZE',
-    overdueCount: '1 po terminie',
-    overdueSub: 'Zadanie pomiarowe SN',
-    risksCount: '1 otwarte ryzyko',
-    risksSub: 'Dostawa aparatury SN',
-    contractsCount: '1 wygasa w 30 dni',
-    contractsSub: 'Umowa serwisowa',
-    items: [
-      {
-        id: 'RSK-012',
-        title: 'Ryzyko opóźnienia dostawy rozdzielnicy SN — etap II',
-        entity: 'Aurora Energy sp. z o.o.',
-        meta: 'Rejestr ryzyk · Wysoki priorytet',
-        tone: 'red',
-      },
-      {
-        id: 'CRM-204',
-        title: 'Wymaga uwagi: brak kontaktu 21 dni (Solaris Grid)',
-        entity: 'Aurora Energy sp. z o.o.',
-        meta: 'CRM · Wymagany następny krok',
-        tone: 'blue',
-      },
-    ],
-  },
-  {
-    id: 'nord',
-    name: 'Nord Events sp. z o.o.',
-    dot: '#A78BFA',
-    dealsCount: '6 aktywnych',
-    dealsSub: 'Wszystkie z datą kroku',
-    projectsCount: '5 w realizacji',
-    projectsSub: 'Eventy i produkcja',
-    overdueCount: '0 po terminie',
-    overdueSub: 'Zespół w terminie',
-    risksCount: '1 otwarte ryzyko',
-    risksSub: 'Rezerwacja hali Q1',
-    contractsCount: '1 wygasa w 30 dni',
-    contractsSub: 'Umowa najmu magazynu',
-    items: [
-      {
-        id: 'CTR-018',
-        title: 'Umowa najmu magazynu centralnego wygasa za 30 dni',
-        entity: 'Nord Events sp. z o.o.',
-        meta: 'Rejestr umów · Alert 30 dni',
-        tone: 'amber',
-      },
-    ],
-  },
-  {
-    id: 'velo',
-    name: 'Velo Auto sp. z o.o.',
-    dot: '#34D399',
-    dealsCount: '5 aktywnych',
-    dealsSub: '2 w negocjacjach',
-    projectsCount: '3 w realizacji',
-    projectsSub: 'Floty i kontrakty B2B',
-    overdueCount: '1 po terminie',
-    overdueSub: 'Weryfikacja umowy floty',
-    risksCount: '1 otwarte ryzyko',
-    risksSub: 'Czas dostawy aut',
-    contractsCount: '1 wygasa w 30 dni',
-    contractsSub: 'Polisa flotowa',
-    items: [
-      {
-        id: 'TSK-112',
-        title: 'Weryfikacja warunków przedłużenia kontraktu flotowego',
-        entity: 'Velo Auto sp. z o.o.',
-        meta: 'Zadanie po terminie · Wczoraj',
-        tone: 'red',
-      },
-    ],
-  },
-] as const;
+/**
+ * Pasek nawigacji, narracji i postępu pod makietą
+ */
+function MockupStoryFooter({
+  steps,
+  currentStepIndex,
+  progress,
+  isPaused,
+  onSelectStep,
+}: {
+  steps: StoryStep[];
+  currentStepIndex: number;
+  progress: number;
+  isPaused: boolean;
+  onSelectStep: (idx: number) => void;
+}) {
+  const current = steps[currentStepIndex] || steps[0];
+  return (
+    <div className="border-t border-slate-800 bg-[#0B0F17] px-3.5 sm:px-4 py-2.5 space-y-2 select-none">
+      {/* Pasek postępu kroku */}
+      <div className="w-full h-1 bg-slate-800 rounded-full overflow-hidden">
+        <div
+          className="h-full bg-[#3554F2] transition-all duration-75 ease-linear"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+        {/* Narracja kroku */}
+        <div className="flex items-center gap-2 text-slate-200 min-w-0">
+          <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold shrink-0">
+            Krok {currentStepIndex + 1}/{steps.length}
+          </span>
+          <span className="font-medium text-slate-200 truncate sm:whitespace-normal">
+            {current.narrative}
+          </span>
+          {isPaused && (
+            <span className="font-mono text-[9px] text-amber-400 bg-amber-500/15 px-1.5 py-0.5 rounded border border-amber-500/30 shrink-0 hidden md:inline">
+              Pauza (wznawia po 8 s)
+            </span>
+          )}
+        </div>
+
+        {/* Przyciski bezpośredniego wyboru kroku */}
+        <div className="flex items-center gap-1 shrink-0 overflow-x-auto pb-0.5 sm:pb-0">
+          {steps.map((st, idx) => (
+            <button
+              key={st.id}
+              type="button"
+              onClick={() => onSelectStep(idx)}
+              className={`px-2 py-0.5 rounded text-[10px] font-mono transition-colors whitespace-nowrap ${
+                currentStepIndex === idx
+                  ? 'bg-[#3554F2] text-white font-semibold shadow-sm'
+                  : 'bg-slate-800/80 text-slate-400 hover:text-slate-200 hover:bg-slate-700'
+              }`}
+            >
+              {idx + 1}. {st.label}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 /**
- * M1 — Hero: widok grupy i przełącznik podmiotów (Aurora Energy, Nord Events, Velo Auto, Grupa — wszystkie).
- * Po wybraniu „Grupa — wszystkie” 5 kafli pulpitu zarządu agreguje się:
- * aktywne szanse, projekty, zadania po terminie, ryzyka, umowy wygasające w 30 dni.
+ * Animowany kursor SVG do prezentacji akcji użytkownika
  */
-export function MockupM1ExecutiveScope({ extended = false }: { extended?: boolean }) {
-  // Stan końcowy (i stan dla prefers-reduced-motion): indeks 0 ("Grupa — wszystkie")
-  const { containerRef, step, selectStepManually } = useViewportLoop(4, 2600, 0);
+function MockupCursor({
+  x,
+  y,
+  isClicking = false,
+  visible = true,
+}: {
+  x: number | string;
+  y: number | string;
+  isClicking?: boolean;
+  visible?: boolean;
+}) {
+  if (!visible) return null;
+  return (
+    <div
+      className="pointer-events-none absolute z-30 transition-all duration-500 ease-out"
+      style={{ left: x, top: y }}
+    >
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        className={`drop-shadow-lg transition-transform duration-200 ${
+          isClicking ? 'scale-90 translate-y-0.5' : 'scale-100'
+        }`}
+      >
+        <path
+          d="M3 3l7 18 3-7 7-3L3 3z"
+          fill="#3554F2"
+          stroke="#FFFFFF"
+          strokeWidth="2"
+          strokeLinejoin="round"
+        />
+      </svg>
+      {isClicking && (
+        <span className="absolute -top-1 -left-1 w-6 h-6 rounded-full border-2 border-indigo-400 animate-ping opacity-75" />
+      )}
+    </div>
+  );
+}
 
+/* =========================================================================
+ * M1 — Hero: Widok grupy i przełącznik podmiotów (4 kroki narracji)
+ * 10. Hero (M1) — „jeden przełącznik, różne widoki”:
+ * animowany kursor otwiera selektor „Podmiot” → wybiera „Aurora Energy” →
+ * liczby KPI płynnie przeliczają się (tween liczb), wiersze innych spółek
+ * zwijają się, sygnały filtrują się → po 4 s powrót do „Grupa — wszystkie”.
+ * Podpis: „Zarząd przełącza widok grupy na jedną spółkę jednym kliknięciem”.
+ * ========================================================================= */
+
+const M1_STEPS: StoryStep[] = [
+  {
+    id: 'group_view',
+    label: 'Grupa — wszystkie',
+    narrative: 'Zarząd widzi zagregowany stan całej grupy: 20 aktywnych szans, 14 projektów i 3 otwarte ryzyka.',
+  },
+  {
+    id: 'cursor_select',
+    label: 'Kursor: wybór spółki',
+    narrative: 'Animowany kursor otwiera selektor podmiotów i klika spółkę zależną Aurora Energy.',
+  },
+  {
+    id: 'single_view',
+    label: 'Aurora Energy (pojedyncza)',
+    narrative: 'Zarząd przełącza widok grupy na jedną spółkę jednym kliknięciem: liczby przeliczają się, inne spółki zwijają się.',
+  },
+  {
+    id: 'return_group',
+    label: 'Powrót do grupy',
+    narrative: 'Jeden klik przywraca pełny widok strategiczny całej grupy i wszystkich jej podmiotów.',
+  },
+];
+
+export function MockupM1ExecutiveScope({ extended = false }: { extended?: boolean }) {
+  const {
+    containerRef,
+    step,
+    progress,
+    isPaused,
+    reducedMotion,
+    selectStep,
+    onMouseEnter,
+    onMouseLeave,
+  } = useStoryLoop({
+    steps: M1_STEPS,
+    stepDurationMs: 4600,
+    defaultReducedStep: 0,
+  });
+
+  // Logika stanów kroków
   const isDropdownOpen = step === 1;
-  const activeEntityIndex = step === 2 ? 1 : step === 3 ? 2 : 0;
-  const current = M1_ENTITIES[activeEntityIndex];
+  const isSingleCompany = step === 2;
+  const isReturn = step === 3;
+
+  // Aktywny podmiot w nagłówku
+  const currentEntityName =
+    isSingleCompany
+      ? 'Aurora Energy sp. z o.o.'
+      : 'Grupa — wszystkie (3 spółki)';
+  const currentEntityDot = isSingleCompany ? '#38BDF8' : '#4F6BFF';
+
+  // Dane KPI zależne od wybranego widoku
+  const kpiData = isSingleCompany
+    ? {
+        deals: '9 szans',
+        dealsSub: '1 wymaga uwagi',
+        projects: '6 projektów',
+        projectsSub: 'Energetyka i OZE',
+        overdue: '1 po terminie',
+        overdueSub: 'Zadanie pomiarowe SN',
+        risks: '1 otwarte',
+        risksSub: 'Aparatura SN',
+        contracts: '1 wygasa',
+        contractsSub: 'Umowa serwisowa PV (28 dni)',
+      }
+    : {
+        deals: '20 szans',
+        dealsSub: '3 wymagają uwagi',
+        projects: '14 projektów',
+        projectsSub: '3 spółki operacyjne',
+        overdue: '2 po terminie',
+        overdueSub: '1 w Aurora · 1 w Velo',
+        risks: '3 otwarte',
+        risksSub: 'Każde ma właściciela',
+        contracts: '3 wygasają',
+        contractsSub: 'Alerty terminów aktywne',
+      };
 
   return (
     <div
       ref={containerRef}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       role="region"
       aria-label="Makieta M1: Przełącznik podmiotów i zagregowany pulpit zarządu GroupOS"
-      className="rounded-2xl border border-slate-700/70 bg-[#0F1523] text-slate-100 shadow-2xl overflow-hidden select-none"
+      className="relative rounded-2xl border border-slate-700/70 bg-[#0F1523] text-slate-100 shadow-2xl overflow-hidden select-none"
     >
-      {/* Górny pasek okna i przełącznik podmiotów */}
+      {/* Animowany kursor wskazujący selektor w kroku 1 i 3 */}
+      {!reducedMotion && (
+        <>
+          {step === 1 && (
+            <MockupCursor
+              x="calc(100% - 190px)"
+              y="68px"
+              isClicking={progress > 50}
+              visible={true}
+            />
+          )}
+          {step === 3 && (
+            <MockupCursor
+              x="calc(100% - 190px)"
+              y="22px"
+              isClicking={progress > 50}
+              visible={true}
+            />
+          )}
+        </>
+      )}
+
+      {/* Pasek okna i przełącznik podmiotów */}
       <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 bg-[#0B0F17] border-b border-slate-800">
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full bg-slate-700" />
@@ -230,18 +382,19 @@ export function MockupM1ExecutiveScope({ extended = false }: { extended?: boolea
           </span>
         </div>
 
+        {/* Selektor podmiotu z menu rozwijanym */}
         <div className="relative">
           <button
             type="button"
-            onClick={() => selectStepManually(activeEntityIndex === 0 ? 2 : 0)}
-            aria-label={`Przełącznik podmiotu: ${current.name}`}
+            onClick={() => selectStep(isSingleCompany ? 0 : 2)}
+            aria-label={`Przełącznik podmiotu: ${currentEntityName}`}
             className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-[#172033] border border-indigo-500/50 text-xs font-medium text-white shadow-sm transition-colors hover:border-indigo-400"
           >
             <span
-              className="w-2 h-2 rounded-full shrink-0"
-              style={{ backgroundColor: current.dot }}
+              className="w-2 h-2 rounded-full shrink-0 transition-colors duration-300"
+              style={{ backgroundColor: currentEntityDot }}
             />
-            <span>Podmiot: {current.name}</span>
+            <span className="transition-all duration-300">{currentEntityName}</span>
             <ChevronDown
               className={`w-3.5 h-3.5 text-slate-300 transition-transform duration-300 ${
                 isDropdownOpen ? 'rotate-180 text-indigo-300' : ''
@@ -249,112 +402,83 @@ export function MockupM1ExecutiveScope({ extended = false }: { extended?: boolea
             />
           </button>
 
+          {/* Symulowane menu rozwijane w kroku 1 */}
           {isDropdownOpen && (
-            <div className="absolute right-0 mt-1.5 w-64 rounded-xl bg-[#161F30] border border-slate-700 shadow-2xl p-1.5 z-20">
-              <div className="px-2.5 py-1 text-[10px] font-mono uppercase tracking-wider text-slate-300">
-                Przełącz podmiot lub widok grupy
+            <div className="absolute right-0 top-full mt-1.5 w-60 rounded-xl bg-[#141C2E] border border-indigo-500/60 shadow-2xl p-1.5 z-40 text-xs space-y-1">
+              <div className="px-2 py-1 text-[10px] font-mono text-slate-400 uppercase tracking-wider">
+                Wybierz zakres widoku:
               </div>
-              {M1_ENTITIES.map((ent, idx) => (
-                <button
-                  key={ent.id}
-                  type="button"
-                  onClick={() => selectStepManually(idx === 0 ? 0 : idx === 1 ? 2 : 3)}
-                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-left text-xs transition-colors ${
-                    idx === 0
-                      ? 'bg-indigo-600/30 text-white font-medium border border-indigo-400/40'
-                      : 'text-slate-200 hover:bg-slate-800/70'
-                  }`}
-                >
-                  <span className="flex items-center gap-2 truncate">
-                    <span
-                      className="w-2 h-2 rounded-full shrink-0"
-                      style={{ backgroundColor: ent.dot }}
-                    />
-                    <span className="truncate">{ent.name}</span>
-                  </span>
-                  {idx === 0 && (
-                    <span className="font-mono text-[10px] text-indigo-200">agregacja</span>
-                  )}
-                </button>
-              ))}
+              <div className="px-2.5 py-1.5 rounded-lg flex items-center justify-between text-slate-300 hover:bg-slate-800">
+                <span className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#4F6BFF]" />
+                  <span>Grupa — wszystkie</span>
+                </span>
+              </div>
+              <div className="px-2.5 py-1.5 rounded-lg flex items-center justify-between bg-indigo-500/25 text-white font-medium border border-indigo-400/50">
+                <span className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#38BDF8]" />
+                  <span>Aurora Energy sp. z o.o.</span>
+                </span>
+                <Check className="w-3.5 h-3.5 text-indigo-300" />
+              </div>
+              <div className="px-2.5 py-1.5 rounded-lg flex items-center justify-between text-slate-400">
+                <span className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#A78BFA]" />
+                  <span>Nord Events sp. z o.o.</span>
+                </span>
+              </div>
+              <div className="px-2.5 py-1.5 rounded-lg flex items-center justify-between text-slate-400">
+                <span className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#34D399]" />
+                  <span>Velo Auto sp. z o.o.</span>
+                </span>
+              </div>
             </div>
           )}
         </div>
       </div>
 
-      {/* Pasek stanu animacji */}
-      <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2 bg-[#121929] border-b border-slate-800/80 text-[11px]">
-        <div className="flex items-center gap-2 text-slate-300">
-          <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400" />
-          <span>
-            {step === 0 &&
-              'Grupa — wszystkie: zagregowane szanse, projekty, zaległości, ryzyka i umowy (30 dni)'}
-            {step === 1 && 'Lista podmiotów: zarząd przełącza kontekst jednym kliknięciem'}
-            {step === 2 && 'Aurora Energy sp. z o.o.: widok zawężony do jednej spółki'}
-            {step === 3 && 'Nord Events sp. z o.o.: osobne szanse, projekty i umowy spółki'}
-          </span>
-        </div>
-        <div className="flex flex-wrap items-center gap-1">
-          {(['Grupa — wszystkie', 'Lista spółek', 'Aurora Energy', 'Nord Events'] as const).map(
-            (label, idx) => (
-              <button
-                key={label}
-                type="button"
-                onClick={() => selectStepManually(idx)}
-                className={`px-2 py-0.5 rounded text-[10px] font-mono transition-colors ${
-                  step === idx
-                    ? 'bg-[#3554F2] text-white font-medium'
-                    : 'text-slate-300 hover:bg-slate-800'
-                }`}
-              >
-                {label}
-              </button>
-            )
-          )}
-        </div>
-      </div>
-
-      {/* 5 zagregowanych kafli KPI zgodnie z Sekcją 6 (M1) */}
+      {/* 5 zagregowanych kafli KPI ze płynnym tweenem liczb */}
       <div className="p-4 sm:p-5 space-y-4">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-          <div className="rounded-xl bg-[#161F31] border border-slate-800 p-3">
+          <div className="rounded-xl bg-[#161F31] border border-slate-800 p-3 transition-colors">
             <div className="text-[11px] text-slate-300 font-medium">Aktywne szanse</div>
-            <div className="mt-1 font-mono text-sm sm:text-base font-semibold text-white tabular-nums">
-              {current.dealsCount}
+            <div className="mt-1 font-mono text-sm sm:text-base font-semibold text-white tabular-nums transition-all duration-300">
+              {kpiData.deals}
             </div>
-            <div className="mt-1 text-[11px] text-emerald-300">{current.dealsSub}</div>
+            <div className="mt-1 text-[11px] text-emerald-300">{kpiData.dealsSub}</div>
           </div>
 
-          <div className="rounded-xl bg-[#161F31] border border-slate-800 p-3">
+          <div className="rounded-xl bg-[#161F31] border border-slate-800 p-3 transition-colors">
             <div className="text-[11px] text-slate-300 font-medium">Projekty</div>
-            <div className="mt-1 font-mono text-sm sm:text-base font-semibold text-white tabular-nums">
-              {current.projectsCount}
+            <div className="mt-1 font-mono text-sm sm:text-base font-semibold text-white tabular-nums transition-all duration-300">
+              {kpiData.projects}
             </div>
-            <div className="mt-1 text-[11px] text-slate-300">{current.projectsSub}</div>
+            <div className="mt-1 text-[11px] text-slate-300">{kpiData.projectsSub}</div>
           </div>
 
-          <div className="rounded-xl bg-[#161F31] border border-slate-800 p-3">
+          <div className="rounded-xl bg-[#161F31] border border-slate-800 p-3 transition-colors">
             <div className="text-[11px] text-slate-300 font-medium">Zadania po terminie</div>
-            <div className="mt-1 font-mono text-sm sm:text-base font-semibold text-amber-300 tabular-nums">
-              {current.overdueCount}
+            <div className="mt-1 font-mono text-sm sm:text-base font-semibold text-amber-300 tabular-nums transition-all duration-300">
+              {kpiData.overdue}
             </div>
-            <div className="mt-1 text-[11px] text-slate-300">{current.overdueSub}</div>
+            <div className="mt-1 text-[11px] text-slate-300">{kpiData.overdueSub}</div>
           </div>
 
-          <div className="rounded-xl bg-[#161F31] border border-slate-800 p-3">
+          <div className="rounded-xl bg-[#161F31] border border-slate-800 p-3 transition-colors">
             <div className="text-[11px] text-slate-300 font-medium">Ryzyka</div>
-            <div className="mt-1 font-mono text-sm sm:text-base font-semibold text-rose-300 tabular-nums">
-              {current.risksCount}
+            <div className="mt-1 font-mono text-sm sm:text-base font-semibold text-rose-300 tabular-nums transition-all duration-300">
+              {kpiData.risks}
             </div>
-            <div className="mt-1 text-[11px] text-slate-300">{current.risksSub}</div>
+            <div className="mt-1 text-[11px] text-slate-300">{kpiData.risksSub}</div>
           </div>
 
-          <div className="rounded-xl bg-[#161F31] border border-slate-800 p-3 col-span-2 sm:col-span-1">
+          <div className="rounded-xl bg-[#161F31] border border-slate-800 p-3 col-span-2 sm:col-span-1 transition-colors">
             <div className="text-[11px] text-slate-300 font-medium">Umowy (wygasające w 30 dni)</div>
-            <div className="mt-1 font-mono text-sm sm:text-base font-semibold text-white tabular-nums">
-              {current.contractsCount}
+            <div className="mt-1 font-mono text-sm sm:text-base font-semibold text-white tabular-nums transition-all duration-300">
+              {kpiData.contracts}
             </div>
-            <div className="mt-1 text-[11px] text-indigo-300">{current.contractsSub}</div>
+            <div className="mt-1 text-[11px] text-indigo-300">{kpiData.contractsSub}</div>
           </div>
         </div>
 
@@ -363,721 +487,1146 @@ export function MockupM1ExecutiveScope({ extended = false }: { extended?: boolea
           <div className="lg:col-span-7 rounded-xl bg-[#141C2C] border border-slate-800 overflow-hidden">
             <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-slate-800 bg-[#101726]">
               <span className="text-xs font-semibold text-white">
-                Podmioty w grupie — zestawienie dla zarządu
+                {isSingleCompany
+                  ? 'Aurora Energy sp. z o.o. — wyodrębniony podmiot'
+                  : 'Podmioty w grupie — zestawienie dla zarządu'}
               </span>
-              <span className="font-mono text-[10px] text-slate-300">Dane fikcyjne</span>
+              <span className="font-mono text-[10px] text-slate-400">Dane fikcyjne</span>
             </div>
             <div className="divide-y divide-slate-800/80 text-xs">
-              {[
-                {
-                  name: 'Aurora Energy sp. z o.o.',
-                  dot: '#38BDF8',
-                  deals: '9 szans',
-                  projects: '6 projektów',
-                  alert: '1 ryzyko · 1 umowa (30 dni)',
-                  active: activeEntityIndex === 0 || activeEntityIndex === 1,
-                },
-                {
-                  name: 'Nord Events sp. z o.o.',
-                  dot: '#A78BFA',
-                  deals: '6 szans',
-                  projects: '5 projektów',
-                  alert: 'Umowa najmu: 30 dni',
-                  active: activeEntityIndex === 0 || activeEntityIndex === 2,
-                },
-                {
-                  name: 'Velo Auto sp. z o.o.',
-                  dot: '#34D399',
-                  deals: '5 szans',
-                  projects: '3 projekty',
-                  alert: '1 zadanie po terminie',
-                  active: activeEntityIndex === 0,
-                },
-              ].map((row) => (
-                <div
-                  key={row.name}
-                  className={`flex flex-wrap items-center justify-between gap-2 px-3.5 py-2.5 transition-opacity ${
-                    row.active ? 'opacity-100' : 'opacity-35'
-                  }`}
-                >
-                  <div className="flex items-center gap-2 min-w-[160px]">
-                    <span
-                      className="w-2 h-2 rounded-full shrink-0"
-                      style={{ backgroundColor: row.dot }}
-                    />
-                    <span className="font-medium text-white">{row.name}</span>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-2.5 font-mono text-[11px] text-slate-300 tabular-nums">
-                    <span>{row.deals}</span>
-                    <span className="text-slate-400">·</span>
-                    <span>{row.projects}</span>
-                    <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-200">
-                      {row.alert}
-                    </span>
-                  </div>
+              {/* Spółka A: Aurora Energy */}
+              <div
+                className={`flex flex-wrap items-center justify-between gap-2 px-3.5 py-2.5 transition-all duration-300 ${
+                  isSingleCompany
+                    ? 'bg-indigo-950/20 border-l-2 border-indigo-400'
+                    : 'opacity-100'
+                }`}
+              >
+                <div className="flex items-center gap-2 min-w-[160px]">
+                  <span className="w-2 h-2 rounded-full shrink-0 bg-[#38BDF8]" />
+                  <span className="font-medium text-white">Aurora Energy sp. z o.o.</span>
                 </div>
-              ))}
+                <div className="flex flex-wrap items-center gap-2.5 font-mono text-[11px] text-slate-300 tabular-nums">
+                  <span>9 szans</span>
+                  <span className="text-slate-500">·</span>
+                  <span>6 projektów</span>
+                  <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-200">
+                    1 ryzyko · 1 umowa (28 dni)
+                  </span>
+                </div>
+              </div>
+
+              {/* Spółka B: Nord Events — zwija się gdy wybrana jest Aurora */}
+              <div
+                className={`flex flex-wrap items-center justify-between gap-2 px-3.5 transition-all duration-300 ${
+                  isSingleCompany
+                    ? 'max-h-0 py-0 opacity-0 overflow-hidden border-none'
+                    : 'max-h-16 py-2.5 opacity-100'
+                }`}
+              >
+                <div className="flex items-center gap-2 min-w-[160px]">
+                  <span className="w-2 h-2 rounded-full shrink-0 bg-[#A78BFA]" />
+                  <span className="font-medium text-white">Nord Events sp. z o.o.</span>
+                </div>
+                <div className="flex flex-wrap items-center gap-2.5 font-mono text-[11px] text-slate-300 tabular-nums">
+                  <span>6 szans</span>
+                  <span className="text-slate-500">·</span>
+                  <span>5 projektów</span>
+                  <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-200">
+                    Umowa najmu: 30 dni
+                  </span>
+                </div>
+              </div>
+
+              {/* Spółka C: Velo Auto — zwija się gdy wybrana jest Aurora */}
+              <div
+                className={`flex flex-wrap items-center justify-between gap-2 px-3.5 transition-all duration-300 ${
+                  isSingleCompany
+                    ? 'max-h-0 py-0 opacity-0 overflow-hidden border-none'
+                    : 'max-h-16 py-2.5 opacity-100'
+                }`}
+              >
+                <div className="flex items-center gap-2 min-w-[160px]">
+                  <span className="w-2 h-2 rounded-full shrink-0 bg-[#34D399]" />
+                  <span className="font-medium text-white">Velo Auto sp. z o.o.</span>
+                </div>
+                <div className="flex flex-wrap items-center gap-2.5 font-mono text-[11px] text-slate-300 tabular-nums">
+                  <span>5 szans</span>
+                  <span className="text-slate-500">·</span>
+                  <span>3 projekty</span>
+                  <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-200">
+                    1 zadanie po terminie
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
 
           <div className="lg:col-span-5 rounded-xl bg-[#141C2C] border border-slate-800 overflow-hidden">
             <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-slate-800 bg-[#101726]">
-              <span className="text-xs font-semibold text-white">Sygnały na pulpicie grupy</span>
+              <span className="text-xs font-semibold text-white">
+                {isSingleCompany
+                  ? 'Sygnały spółki: Aurora Energy'
+                  : 'Sygnały na pulpicie grupy'}
+              </span>
               <span className="font-mono text-[10px] text-indigo-300">
-                {current.items.length} poz.
+                {isSingleCompany ? '2 poz.' : '3 poz.'}
               </span>
             </div>
             <div className="divide-y divide-slate-800/80">
-              {current.items.map((item) => (
-                <div key={item.id} className="px-3.5 py-2.5 space-y-1">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-mono text-[10px] text-slate-300">{item.id}</span>
-                    <span
-                      className={`font-mono text-[10px] px-1.5 py-0.5 rounded ${
-                        item.tone === 'red'
-                          ? 'bg-rose-500/20 text-rose-200'
-                          : item.tone === 'amber'
-                          ? 'bg-amber-500/20 text-amber-200'
-                          : 'bg-sky-500/20 text-sky-200'
-                      }`}
-                    >
-                      {item.meta}
-                    </span>
+              {/* Sygnał 1: RSK-012 (Aurora Energy) */}
+              <div className="px-3.5 py-2.5 space-y-1">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-mono text-[10px] text-slate-300">RSK-012</span>
+                  <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-200">
+                    Rejestr ryzyk · Wysoki
+                  </span>
+                </div>
+                <div className="text-xs font-medium text-white leading-snug">
+                  Ryzyko opóźnienia dostawy rozdzielnicy SN — etap II
+                </div>
+                <div className="text-[11px] text-slate-300">Aurora Energy sp. z o.o.</div>
+              </div>
+
+              {/* Sygnał 2: CRM-204 (Aurora Energy) */}
+              <div className="px-3.5 py-2.5 space-y-1">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-mono text-[10px] text-slate-300">CRM-204</span>
+                  <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-200">
+                    CRM · Wymagany krok
+                  </span>
+                </div>
+                <div className="text-xs font-medium text-white leading-snug">
+                  Wymaga uwagi: brak kontaktu 21 dni (Solaris Grid)
+                </div>
+                <div className="text-[11px] text-slate-300">Aurora Energy sp. z o.o.</div>
+              </div>
+
+              {/* Sygnał 3: CTR-018 (Nord Events) — ukryty w widoku pojedynczym */}
+              <div
+                className={`px-3.5 space-y-1 transition-all duration-300 ${
+                  isSingleCompany
+                    ? 'max-h-0 py-0 opacity-0 overflow-hidden border-none'
+                    : 'max-h-20 py-2.5 opacity-100'
+                }`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-mono text-[10px] text-slate-300">CTR-018</span>
+                  <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-200">
+                    Rejestr umów · Alert 30 dni
+                  </span>
+                </div>
+                <div className="text-xs font-medium text-white leading-snug">
+                  Umowa najmu magazynu centralnego wygasa za 30 dni
+                </div>
+                <div className="text-[11px] text-slate-300">Nord Events sp. z o.o.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Pasek narracji i postępu M1 */}
+      <MockupStoryFooter
+        steps={M1_STEPS}
+        currentStepIndex={step}
+        progress={progress}
+        isPaused={isPaused}
+        onSelectStep={selectStep}
+      />
+    </div>
+  );
+}
+
+/* =========================================================================
+ * M1-DEEP — Pulpit zarządu (Sekcja 7.5 #pulpit):
+ * Pokazuje dedykowany widok jednej spółki zależnej (Aurora Energy)
+ * z rozbiciem etapów, portfelem, szansami i kartami narzędziowymi.
+ * Zgodnie z wytyczną Nit 9: różni się od widoku grupy w Hero.
+ * ========================================================================= */
+export function MockupM1ExecutiveDeepDive() {
+  const [activeTab, setActiveTab] = useState<'overview' | 'deals' | 'stages'>('overview');
+
+  return (
+    <div
+      role="region"
+      aria-label="Makieta Pulpitu Zarządu: Widok pojedynczej spółki Aurora Energy sp. z o.o."
+      className="rounded-2xl border border-slate-700/80 bg-[#0F1523] text-slate-100 shadow-2xl overflow-hidden select-none"
+    >
+      {/* Pasek nagłówka okna */}
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 bg-[#0B0F17] border-b border-slate-800">
+        <div className="flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-full bg-slate-700" />
+          <span className="w-2.5 h-2.5 rounded-full bg-slate-700" />
+          <span className="w-2.5 h-2.5 rounded-full bg-slate-700" />
+          <span className="ml-2 font-mono text-[11px] text-slate-300 tracking-wide">
+            GroupOS · Spółka: Aurora Energy sp. z o.o. · Widok operacyjny
+          </span>
+        </div>
+
+        <div className="flex items-center gap-1.5">
+          {[
+            { id: 'overview', label: 'Przegląd spółki' },
+            { id: 'deals', label: 'Lejek szans (9)' },
+            { id: 'stages', label: 'Realizacja projektów (6)' },
+          ].map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => setActiveTab(t.id as typeof activeTab)}
+              className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
+                activeTab === t.id
+                  ? 'bg-[#3554F2] text-white shadow-sm'
+                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="p-4 sm:p-5 space-y-4">
+        {/* KPI wybranej spółki */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="rounded-xl bg-[#141C2E] border border-slate-800 p-3.5">
+            <div className="text-[11px] text-slate-300">Wartość szans w toku</div>
+            <div className="mt-1 font-mono text-base font-semibold text-white">1 420 000 PLN</div>
+            <div className="mt-1 text-[11px] text-emerald-300">9 szans w lejkach</div>
+          </div>
+          <div className="rounded-xl bg-[#141C2E] border border-slate-800 p-3.5">
+            <div className="text-[11px] text-slate-300">Aktywne projekty</div>
+            <div className="mt-1 font-mono text-base font-semibold text-white">6 w realizacji</div>
+            <div className="mt-1 text-[11px] text-sky-300">84% etapów w terminie</div>
+          </div>
+          <div className="rounded-xl bg-[#141C2E] border border-slate-800 p-3.5">
+            <div className="text-[11px] text-slate-300">Zadania po terminie</div>
+            <div className="mt-1 font-mono text-base font-semibold text-amber-300">1 zadanie</div>
+            <div className="mt-1 text-[11px] text-slate-400">Pomiary rozdzielnicy</div>
+          </div>
+          <div className="rounded-xl bg-[#141C2E] border border-slate-800 p-3.5">
+            <div className="text-[11px] text-slate-300">Umowy wygasające (30 dni)</div>
+            <div className="mt-1 font-mono text-base font-semibold text-white">1 umowa</div>
+            <div className="mt-1 text-[11px] text-indigo-300">Serwis PV · 28 dni do końca</div>
+          </div>
+        </div>
+
+        {/* Projekty spółki Aurora */}
+        <div className="rounded-xl bg-[#141C2E] border border-slate-800 p-4 space-y-3">
+          <div className="flex items-center justify-between text-xs font-semibold text-white border-b border-slate-800 pb-2">
+            <span>Bieżące projekty i etapy operacyjne (Aurora Energy)</span>
+            <span className="font-mono text-[10px] text-slate-400">Widok zarządczy</span>
+          </div>
+
+          <div className="space-y-2">
+            {[
+              {
+                id: 'PRJ-042',
+                name: 'Stacja transformatorowa SN — Etap II',
+                stage: 'Próby i pomiary odbiorowe',
+                progress: 75,
+                owner: 'Piotr Zieliński',
+                statusTone: 'sky',
+              },
+              {
+                id: 'PRJ-045',
+                name: 'Farma PV Południe — Uzgodnienia przyłączeniowe',
+                stage: 'Kompletacja dokumentacji prawnej',
+                progress: 40,
+                owner: 'Karolina Nowak',
+                statusTone: 'indigo',
+              },
+              {
+                id: 'PRJ-048',
+                name: 'Serwis turbin wiatrowych Baltic — Przegląd okresowy',
+                stage: 'Odbiór protokołu serwisowego',
+                progress: 90,
+                owner: 'Tomasz Bąk',
+                statusTone: 'emerald',
+              },
+            ].map((p) => (
+              <div
+                key={p.id}
+                className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-lg bg-[#101726] border border-slate-800 text-xs"
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-[10px] text-slate-400">{p.id}</span>
+                    <span className="font-semibold text-white">{p.name}</span>
                   </div>
-                  <div className="text-xs font-medium text-white leading-snug">{item.title}</div>
-                  <div className="text-[11px] text-slate-300">{item.entity}</div>
+                  <div className="text-[11px] text-slate-300">
+                    Etap: {p.stage} · Odpowiedzialny: {p.owner}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 shrink-0">
+                  <div className="w-28 h-2 rounded-full bg-slate-800 overflow-hidden">
+                    <div
+                      className="h-full bg-indigo-400 transition-all duration-300"
+                      style={{ width: `${p.progress}%` }}
+                    />
+                  </div>
+                  <span className="font-mono text-[11px] text-indigo-200 tabular-nums w-8 text-right">
+                    {p.progress}%
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 3 karty narzędziowe pulpitu */}
+        <div className="grid sm:grid-cols-3 gap-3 pt-1">
+          <div className="rounded-xl bg-[#101726] border border-slate-800 px-3.5 py-3 space-y-1">
+            <div className="text-[11px] text-slate-300 font-medium">Zapisane widoki i eksport</div>
+            <div className="font-mono text-xs font-semibold text-white">
+              Filtr: Realizacja Q4 Aurora
+            </div>
+            <div className="text-[11px] text-slate-400">
+              Eksport z bieżącego widoku do formatu XLS/CSV
+            </div>
+          </div>
+          <div className="rounded-xl bg-[#101726] border border-slate-800 px-3.5 py-3 space-y-1">
+            <div className="text-[11px] text-slate-300 font-medium">Wyszukiwanie globalne (Cmd+K)</div>
+            <div className="font-mono text-xs font-semibold text-white">
+              Zakres: Spółka Aurora Energy
+            </div>
+            <div className="text-[11px] text-slate-400">
+              Przeszukuje firmy, osoby, szanse, zadania i umowy
+            </div>
+          </div>
+          <div className="rounded-xl bg-[#101726] border border-slate-800 px-3.5 py-3 space-y-1">
+            <div className="text-[11px] text-slate-300 font-medium">Raport zaległości i terminów</div>
+            <div className="font-mono text-xs font-semibold text-white">
+              1 zadanie · 1 umowa (28 dni)
+            </div>
+            <div className="text-[11px] text-slate-400">
+              Powiadomienia trafiają wyłącznie do zespołu spółki
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* =========================================================================
+ * M5 — Izolacja danych w grupie (3 kroki narracji)
+ * 11. Izolacja (M5) — „ta sama baza, różne uprawnienia”:
+ * po wejściu w viewport sama przełącza Prezes → Kierownik spółki A;
+ * na Spółce B i C pojawia się kłódka z krótką animacją, a wiersze przygasają.
+ * To najmocniejszy argument produktu — bezpośrednio pod paskiem referencji.
+ * ========================================================================= */
+
+const M5_STEPS: StoryStep[] = [
+  {
+    id: 'prezes_view',
+    label: 'Prezes (cała grupa)',
+    narrative: 'Prezes grupy (Marek Jaworski) posiada pełny wgląd we wszystkie 3 spółki, ich kontrakty i finanse.',
+  },
+  {
+    id: 'switch_manager',
+    label: 'Przełączenie: Kierownik Spółki A',
+    narrative: 'Zmiana kontekstu użytkownika: system natychmiast aplikuje uprawnienia Karoliny Nowak (Kierownik Spółki A).',
+  },
+  {
+    id: 'locked_view',
+    label: 'Kłódka na Spółce B i C',
+    narrative: 'Na Spółce B i C pojawia się kłódka: pracownik spółki A nie ma dostępu do danych ani umów pozostałych firm.',
+  },
+];
+
+export function MockupM5AccessMatrix() {
+  const {
+    containerRef,
+    step,
+    progress,
+    isPaused,
+    reducedMotion,
+    selectStep,
+    onMouseEnter,
+    onMouseLeave,
+  } = useStoryLoop({
+    steps: M5_STEPS,
+    stepDurationMs: 4400,
+    defaultReducedStep: 2, // w trybie reduced motion pokazujemy stan izolacji
+  });
+
+  const isPrezesActive = step === 0;
+  const isSwitching = step === 1;
+  const isManagerLocked = step >= 1;
+
+  return (
+    <div
+      ref={containerRef}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      role="region"
+      aria-label="Makieta M5: Izolacja danych w grupie — Prezes vs Kierownik spółki A"
+      className="rounded-2xl border border-slate-700/80 bg-[#0F1523] text-slate-100 shadow-2xl overflow-hidden select-none"
+    >
+      <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 bg-[#0B0F17] border-b border-slate-800">
+        <div className="flex items-center gap-2">
+          <UserCheck className="w-4 h-4 text-indigo-300" />
+          <span className="text-xs font-semibold text-white">
+            Izolacja danych w grupie · Prezes vs Kierownik spółki zależnej
+          </span>
+        </div>
+        <span className="font-mono text-[10px] text-slate-400">
+          Silnik RBAC: Organizacja → Podmiot → Projekt → Rekord
+        </span>
+      </div>
+
+      <div className="p-4 sm:p-5 space-y-4">
+        <div className="grid sm:grid-cols-2 gap-4 text-xs">
+          {/* Użytkownik 1: Prezes */}
+          <div
+            className={`rounded-xl p-4 border transition-all duration-300 ${
+              isPrezesActive
+                ? 'bg-[#162038] border-indigo-400 shadow-lg ring-1 ring-indigo-400/30'
+                : 'bg-[#12192B]/80 border-slate-800 opacity-70'
+            }`}
+          >
+            <div className="flex items-center justify-between gap-2 mb-3">
+              <div>
+                <div className="font-semibold text-white text-sm">Marek Jaworski — Prezes</div>
+                <div className="text-[11px] text-slate-400">Rola: Właściciel organizacji</div>
+              </div>
+              <span className="font-mono text-[10px] px-2.5 py-1 rounded bg-indigo-500/25 text-indigo-200 border border-indigo-400/40 font-semibold">
+                Cała grupa (3 spółki)
+              </span>
+            </div>
+
+            <div className="space-y-2">
+              {[
+                { name: 'Spółka A · Aurora Energy sp. z o.o.', dot: '#38BDF8' },
+                { name: 'Spółka B · Nord Events sp. z o.o.', dot: '#A78BFA' },
+                { name: 'Spółka C · Velo Auto sp. z o.o.', dot: '#34D399' },
+              ].map((ent) => (
+                <div
+                  key={ent.name}
+                  className="flex items-center justify-between px-3 py-2 rounded-lg bg-[#0E1422] border border-slate-800"
+                >
+                  <span className="flex items-center gap-2 text-slate-200">
+                    <span
+                      className="w-2 h-2 rounded-full shrink-0"
+                      style={{ backgroundColor: ent.dot }}
+                    />
+                    <span>{ent.name}</span>
+                  </span>
+                  <span className="inline-flex items-center gap-1 font-mono text-[10px] text-emerald-300 font-medium">
+                    <Check className="w-3 h-3" /> Pełny dostęp
+                  </span>
                 </div>
               ))}
             </div>
           </div>
-        </div>
 
-        {/* Wariant rozszerzony dla sekcji 7.5 (Pulpit zarządu) — bez rachunków bankowych */}
-        {extended && (
-          <div className="grid sm:grid-cols-3 gap-3 pt-1">
-            {[
-              {
-                title: 'Zapisane widoki i eksport widoku',
-                value: 'Filtr: Zaległości i ryzyka Q4',
-                sub: 'Gotowy do eksportu z bieżącego widoku tabeli',
-              },
-              {
-                title: 'Wyszukiwanie globalne (Cmd+K)',
-                value: 'Przeszukuje spółki zgodnie z rolą',
-                sub: 'Firmy, osoby, szanse, projekty, dokumenty i umowy',
-              },
-              {
-                title: 'Raport zaległości i przypomnienia',
-                value: '2 zadania po terminie · 3 umowy (30 dni)',
-                sub: 'Zespoły spółek widzą wyłącznie własne przypomnienia',
-              },
-            ].map((card) => (
-              <div
-                key={card.title}
-                className="rounded-xl bg-[#101726] border border-slate-800 px-3.5 py-3 flex flex-col justify-between"
-              >
-                <div className="text-[11px] text-slate-300">{card.title}</div>
-                <div className="mt-1 font-mono text-xs sm:text-sm font-semibold text-white">
-                  {card.value}
+          {/* Użytkownik 2: Kierownik spółki A (Karolina Nowak) */}
+          <div
+            className={`rounded-xl p-4 border transition-all duration-300 ${
+              isManagerLocked
+                ? 'bg-[#162038] border-indigo-400 shadow-lg ring-1 ring-indigo-400/30'
+                : 'bg-[#12192B]/80 border-slate-800 opacity-70'
+            }`}
+          >
+            <div className="flex items-center justify-between gap-2 mb-3">
+              <div>
+                <div className="font-semibold text-white text-sm">
+                  Karolina Nowak — Kierownik spółki A
                 </div>
-                <div className="mt-1 text-[11px] text-slate-300">{card.sub}</div>
+                <div className="text-[11px] text-slate-400">
+                  Przypisanie: wyłącznie Aurora Energy sp. z o.o.
+                </div>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-/**
- * M5 — Izolacja danych w grupie:
- * Dwóch użytkowników: prezes widzi całą grupę, kierownik spółki A widzi tylko spółkę A,
- * a dane spółki B (i C) są dla niego zablokowane (kłódka).
- */
-export function MockupM5AccessMatrix() {
-  const { containerRef, step, selectStepManually } = useViewportLoop(2, 3200, 1);
-
-  const isManagerView = step === 1;
-
-  return (
-    <div
-      ref={containerRef}
-      role="region"
-      aria-label="Makieta M5: Izolacja danych w grupie — Prezes vs Kierownik spółki A"
-      className="rounded-xl border border-slate-700/80 bg-[#0F1523] text-slate-100 p-4 shadow-xl space-y-3"
-    >
-      <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800">
-        <div className="flex items-center gap-2">
-          <UserCheck className="w-4 h-4 text-indigo-300" />
-          <span className="text-xs font-semibold text-white">
-            Izolacja danych: Prezes grupy vs Kierownik spółki A
-          </span>
-        </div>
-        <div className="flex gap-1">
-          {[
-            '1. Prezes (widzi całą grupę)',
-            '2. Kierownik spółki A (spółka B zablokowana)',
-          ].map((label, idx) => (
-            <button
-              key={label}
-              type="button"
-              onClick={() => selectStepManually(idx)}
-              className={`px-2 py-0.5 rounded font-mono text-[10px] ${
-                step === idx ? 'bg-[#3554F2] text-white' : 'bg-slate-800 text-slate-300'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="grid sm:grid-cols-2 gap-3 text-xs">
-        {/* Użytkownik 1: Prezes */}
-        <div
-          className={`rounded-xl p-3.5 border transition-all ${
-            !isManagerView
-              ? 'bg-[#162038] border-indigo-400 shadow-md'
-              : 'bg-[#12192B] border-slate-800'
-          }`}
-        >
-          <div className="flex items-center justify-between gap-2 mb-2.5">
-            <div>
-              <div className="font-semibold text-white">Marek Jaworski — Prezes</div>
-              <div className="text-[11px] text-slate-300">Rola: Właściciel organizacji</div>
+              <span className="font-mono text-[10px] px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-200 border border-emerald-400/40 font-semibold">
+                Tylko Spółka A
+              </span>
             </div>
-            <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-indigo-500/25 text-indigo-200 border border-indigo-400/40">
-              Cała grupa
-            </span>
-          </div>
-          <div className="space-y-1.5">
-            {[
-              'Spółka A · Aurora Energy sp. z o.o.',
-              'Spółka B · Nord Events sp. z o.o.',
-              'Spółka C · Velo Auto sp. z o.o.',
-            ].map((ent) => (
-              <div
-                key={ent}
-                className="flex items-center justify-between px-2.5 py-1.5 rounded bg-[#0E1422] border border-slate-800"
-              >
-                <span className="text-slate-100">{ent}</span>
-                <span className="inline-flex items-center gap-1 font-mono text-[10px] text-emerald-300">
-                  <Check className="w-3 h-3" /> Pełny dostęp
+
+            <div className="space-y-2">
+              {/* Spółka A: Dostęp aktywny */}
+              <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-[#0E1422] border border-emerald-500/50 shadow-sm">
+                <span className="flex items-center gap-2 text-white font-medium">
+                  <span className="w-2 h-2 rounded-full shrink-0 bg-[#38BDF8]" />
+                  <span>Spółka A · Aurora Energy sp. z o.o.</span>
+                </span>
+                <span className="inline-flex items-center gap-1 font-mono text-[10px] text-emerald-300 font-semibold">
+                  <Check className="w-3.5 h-3.5" /> Dostęp aktywny
                 </span>
               </div>
-            ))}
-          </div>
-        </div>
 
-        {/* Użytkownik 2: Kierownik spółki A */}
-        <div
-          className={`rounded-xl p-3.5 border transition-all ${
-            isManagerView
-              ? 'bg-[#162038] border-indigo-400 shadow-md'
-              : 'bg-[#12192B] border-slate-800'
-          }`}
-        >
-          <div className="flex items-center justify-between gap-2 mb-2.5">
-            <div>
-              <div className="font-semibold text-white">Karolina Nowak — Kierownik spółki A</div>
-              <div className="text-[11px] text-slate-300">Przypisanie: wyłącznie Aurora Energy</div>
-            </div>
-            <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-200 border border-emerald-400/40">
-              Tylko Spółka A
-            </span>
-          </div>
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between px-2.5 py-1.5 rounded bg-[#0E1422] border border-emerald-500/40">
-              <span className="text-white font-medium">Spółka A · Aurora Energy sp. z o.o.</span>
-              <span className="inline-flex items-center gap-1 font-mono text-[10px] text-emerald-300">
-                <Check className="w-3 h-3" /> Dostęp aktywny
-              </span>
-            </div>
+              {/* Spółka B: Kłódka z animacją */}
+              <div
+                className={`flex items-center justify-between px-3 py-2 rounded-lg transition-all duration-300 ${
+                  isManagerLocked
+                    ? 'bg-rose-950/20 border border-rose-500/40 opacity-50'
+                    : 'bg-[#0E1422] border border-slate-800'
+                }`}
+              >
+                <span className="flex items-center gap-2 text-slate-300">
+                  <span className="w-2 h-2 rounded-full shrink-0 bg-[#A78BFA]" />
+                  <span>Spółka B · Nord Events sp. z o.o.</span>
+                </span>
+                <span className="inline-flex items-center gap-1.5 font-mono text-[10px] text-rose-300 font-semibold">
+                  <Lock
+                    className={`w-3.5 h-3.5 transition-transform duration-300 ${
+                      isManagerLocked ? 'scale-110 text-rose-400' : ''
+                    }`}
+                  />
+                  <span>Dostęp zablokowany</span>
+                </span>
+              </div>
 
-            <div className="flex items-center justify-between px-2.5 py-1.5 rounded bg-rose-950/25 border border-rose-500/40">
-              <span className="text-slate-300">Spółka B · Nord Events sp. z o.o.</span>
-              <span className="inline-flex items-center gap-1 font-mono text-[10px] text-rose-200">
-                <Lock className="w-3 h-3" /> Zablokowane
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between px-2.5 py-1.5 rounded bg-rose-950/25 border border-rose-500/40">
-              <span className="text-slate-300">Spółka C · Velo Auto sp. z o.o.</span>
-              <span className="inline-flex items-center gap-1 font-mono text-[10px] text-rose-200">
-                <Lock className="w-3 h-3" /> Zablokowane
-              </span>
+              {/* Spółka C: Kłódka z animacją */}
+              <div
+                className={`flex items-center justify-between px-3 py-2 rounded-lg transition-all duration-300 ${
+                  isManagerLocked
+                    ? 'bg-rose-950/20 border border-rose-500/40 opacity-50'
+                    : 'bg-[#0E1422] border border-slate-800'
+                }`}
+              >
+                <span className="flex items-center gap-2 text-slate-300">
+                  <span className="w-2 h-2 rounded-full shrink-0 bg-[#34D399]" />
+                  <span>Spółka C · Velo Auto sp. z o.o.</span>
+                </span>
+                <span className="inline-flex items-center gap-1.5 font-mono text-[10px] text-rose-300 font-semibold">
+                  <Lock
+                    className={`w-3.5 h-3.5 transition-transform duration-300 ${
+                      isManagerLocked ? 'scale-110 text-rose-400' : ''
+                    }`}
+                  />
+                  <span>Dostęp zablokowany</span>
+                </span>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      <MockupStoryFooter
+        steps={M5_STEPS}
+        currentStepIndex={step}
+        progress={progress}
+        isPaused={isPaused}
+        onSelectStep={selectStep}
+      />
     </div>
   );
 }
 
-/**
- * M2 — CRM: szansa w lejku:
- * Karta szansy przesuwa się między etapami. System wymaga „następnego kroku” z datą.
- * Na liście pojawia się znacznik „Wymaga uwagi: brak kontaktu 21 dni”.
- * Na osi aktywności wpada szybki wpis „Rozmowa telefoniczna”.
- */
-export function MockupM2CrmPipeline() {
-  const { containerRef, step, selectStepManually } = useViewportLoop(3, 2700, 2);
+/* =========================================================================
+ * M2 — CRM: Szansa w lejku (3 kroki narracji)
+ * 12. CRM (M2) — „system pilnuje następnego kroku”:
+ * karta szansy przesuwa się do kolejnego etapu → pojawia się okno
+ * „Wymagany następny krok” z datą → ten krok pojawia się jako zadanie
+ * w „Moja praca”. Pokazuje realną funkcję (KAM-207: następny krok jako zadanie).
+ * ========================================================================= */
 
-  const movedStage = step >= 1;
-  const callLogged = step === 2;
+const M2_STEPS: StoryStep[] = [
+  {
+    id: 'attention_card',
+    label: '1. Brak kontaktu 21 dni',
+    narrative: 'System wykrywa brak kontaktu: szansa DEAL-211 (Solaris Grid) oznaczona jako »Wymaga uwagi: brak kontaktu 21 dni«.',
+  },
+  {
+    id: 'stage_move',
+    label: '2. Przesunięcie + Wymagany krok',
+    narrative: 'Karta przesuwa się do etapu Negocjacje: GroupOS wymaga podania konkretnej daty i opisu następnego kroku z klientem.',
+  },
+  {
+    id: 'my_work_task',
+    label: '3. Zadanie w »Moja praca« (KAM-207)',
+    narrative: 'Zgodnie z KAM-207 następny krok automatycznie staje się zadaniem w widoku »Moja praca« i kalendarzu handlowca.',
+  },
+];
+
+export function MockupM2CrmPipeline() {
+  const {
+    containerRef,
+    step,
+    progress,
+    isPaused,
+    reducedMotion,
+    selectStep,
+    onMouseEnter,
+    onMouseLeave,
+  } = useStoryLoop({
+    steps: M2_STEPS,
+    stepDurationMs: 4600,
+    defaultReducedStep: 2,
+  });
+
+  const isMovedStage = step >= 1;
+  const isTaskCreated = step === 2;
 
   return (
     <div
       ref={containerRef}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       role="region"
-      aria-label="Makieta M2: Szansa w lejku CRM, wymagany następny krok i oś aktywności"
-      className="rounded-2xl border border-slate-700/80 bg-[#0F1523] text-slate-100 p-4 sm:p-5 shadow-2xl space-y-4"
+      aria-label="Makieta M2: Szansa w lejku CRM, wymagany następny krok i zadanie w Moja praca"
+      className="rounded-2xl border border-slate-700/80 bg-[#0F1523] text-slate-100 shadow-2xl overflow-hidden select-none"
     >
-      <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 bg-[#0B0F17] border-b border-slate-800">
         <div>
           <div className="text-xs font-semibold text-white">
             CRM · Lejek szans per podmiot + Oś aktywności
           </div>
-          <div className="text-[11px] text-slate-300">
-            Firmy i osoby jako osobne obiekty · Wymagany następny krok z datą
+          <div className="text-[11px] text-slate-400">
+            Firmy i osoby jako osobne obiekty · Wymagany następny krok z datą (KAM-207)
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-1.5">
-          {([
-            '1. Brak kontaktu 21 dni',
-            '2. Przesunięcie + Następny krok',
-            '3. Wpis: Rozmowa telefoniczna',
-          ] as const).map((label, idx) => (
-            <button
-              key={label}
-              type="button"
-              onClick={() => selectStepManually(idx)}
-              className={`px-2 py-1 rounded font-mono text-[10px] transition-colors ${
-                step === idx ? 'bg-[#3554F2] text-white' : 'bg-slate-800 text-slate-300'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+        <span className="font-mono text-[10px] text-indigo-300">
+          Podmiot: Aurora Energy sp. z o.o.
+        </span>
       </div>
 
-      {/* Kolumny lejka */}
-      <div className="grid sm:grid-cols-3 gap-3">
-        {/* Etap 1: Kwalifikacja / Oferta */}
-        <div className="rounded-xl bg-[#141C2E] border border-slate-800 p-3 space-y-2.5">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-2 text-xs">
-            <span className="font-semibold text-white">Oferta</span>
-            <span className="font-mono text-[10px] text-slate-300">Aurora Energy</span>
+      <div className="p-4 sm:p-5 space-y-4">
+        <div className="grid sm:grid-cols-3 gap-3">
+          {/* Etap 1: Oferta */}
+          <div className="rounded-xl bg-[#141C2E] border border-slate-800 p-3 space-y-2.5">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-2 text-xs">
+              <span className="font-semibold text-white">1. Oferta</span>
+              <span className="font-mono text-[10px] text-slate-400">Aurora Energy</span>
+            </div>
+
+            {/* Karta DEAL-211 gdy jeszcze nie przesunięta */}
+            {!isMovedStage && (
+              <div className="rounded-lg p-3 bg-amber-950/30 border border-amber-500/60 space-y-2 animate-panel-in shadow-md">
+                <div className="flex items-center justify-between font-mono text-[10px]">
+                  <span className="text-amber-200">DEAL-211</span>
+                  <span className="px-1.5 py-0.5 rounded bg-amber-500/25 text-amber-200 font-semibold">
+                    Wymaga uwagi: brak kontaktu 21 dni
+                  </span>
+                </div>
+                <div className="text-xs font-semibold text-white">
+                  Solaris Grid — modernizacja rozdzielnicy SN
+                </div>
+                <div className="text-[11px] text-amber-200 flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 shrink-0" />
+                  <span>System wymaga zaplanowania następnego kroku</span>
+                </div>
+              </div>
+            )}
+
+            <div className="rounded-lg p-3 bg-[#182238] border border-slate-700/70 space-y-1.5">
+              <div className="flex items-center justify-between font-mono text-[10px] text-slate-400">
+                <span>DEAL-215</span>
+                <span>Nord Events</span>
+              </div>
+              <div className="text-xs font-medium text-white">
+                Obsługa scenografii Kongresu Horyzont
+              </div>
+              <div className="text-[11px] text-slate-400 font-mono">
+                Następny krok: 18.11 · Prezentacja
+              </div>
+            </div>
           </div>
 
-          {!movedStage && (
-            <div className="rounded-lg p-3 bg-amber-950/30 border border-amber-500/60 space-y-2">
-              <div className="flex items-center justify-between font-mono text-[10px]">
-                <span className="text-amber-200">DEAL-211</span>
-                <span className="px-1.5 py-0.5 rounded bg-amber-500/25 text-amber-200 font-semibold">
-                  Wymaga uwagi: brak kontaktu 21 dni
-                </span>
-              </div>
-              <div className="text-xs font-semibold text-white">
-                Solaris Grid — modernizacja rozdzielnicy SN
-              </div>
-              <div className="text-[11px] text-amber-200 flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 shrink-0" />
-                <span>System wymaga „następnego kroku” z datą</span>
-              </div>
+          {/* Etap 2: Negocjacje */}
+          <div className="rounded-xl bg-[#141C2E] border border-slate-800 p-3 space-y-2.5">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-2 text-xs">
+              <span className="font-semibold text-white">2. Negocjacje</span>
+              <span className="font-mono text-[10px] text-indigo-300">Wymagany następny krok</span>
             </div>
-          )}
 
-          <div className="rounded-lg p-3 bg-[#182238] border border-slate-700/70 space-y-1.5">
-            <div className="flex items-center justify-between font-mono text-[10px] text-slate-300">
-              <span>DEAL-215</span>
-              <span>Nord Events</span>
-            </div>
-            <div className="text-xs font-medium text-white">Obsługa scenografii Kongresu Horyzont</div>
-            <div className="text-[11px] text-slate-300 font-mono">
-              Następny krok: 18.11 · Prezentacja koncepcji
+            {/* Karta przesunięta do Negocjacji */}
+            {isMovedStage && (
+              <div className="rounded-lg p-3 bg-indigo-950/40 border border-indigo-400 space-y-2 shadow-lg animate-panel-in">
+                <div className="flex items-center justify-between font-mono text-[10px]">
+                  <span className="text-indigo-200">DEAL-211 · Solaris Grid</span>
+                  <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-200 font-semibold">
+                    Krok zaplanowany
+                  </span>
+                </div>
+                <div className="text-xs font-semibold text-white">
+                  Solaris Grid — modernizacja rozdzielnicy SN
+                </div>
+                <div className="text-[11px] text-indigo-200 font-mono flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 shrink-0" />
+                  <span>Następny krok: 21.11 · Omówienie warunków</span>
+                </div>
+              </div>
+            )}
+
+            <div className="rounded-lg p-3 bg-[#182238] border border-slate-700/70 space-y-1.5">
+              <div className="flex items-center justify-between font-mono text-[10px] text-slate-400">
+                <span>DEAL-198</span>
+                <span>Velo Auto</span>
+              </div>
+              <div className="text-xs font-medium text-white">
+                Wynajem 12 aut serwisowych dla ekipy
+              </div>
+              <div className="text-[11px] text-slate-400 font-mono">
+                Następny krok: 24.11 · Akceptacja umowy
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Etap 2: Negocjacje */}
-        <div className="rounded-xl bg-[#141C2E] border border-slate-800 p-3 space-y-2.5">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-2 text-xs">
-            <span className="font-semibold text-white">Negocjacje</span>
-            <span className="font-mono text-[10px] text-indigo-300">Wymagany następny krok</span>
-          </div>
-
-          {movedStage && (
-            <div className="rounded-lg p-3 bg-indigo-950/40 border border-indigo-400 space-y-2 shadow-lg">
-              <div className="flex items-center justify-between font-mono text-[10px]">
-                <span className="text-indigo-200">DEAL-211 · Solaris Grid</span>
-                <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-200">
-                  Krok zaplanowany
-                </span>
+          {/* Kolumna 3: Moja praca (KAM-207) oraz Oś aktywności */}
+          <div className="rounded-xl bg-[#141C2E] border border-slate-800 p-3 flex flex-col justify-between space-y-3">
+            <div className="space-y-2.5">
+              <div className="border-b border-slate-800 pb-2 flex items-center justify-between text-xs">
+                <span className="font-semibold text-white">Moja praca · Zadania handlowca</span>
+                <span className="font-mono text-[10px] text-indigo-300">KAM-207</span>
               </div>
-              <div className="text-xs font-semibold text-white">
-                Solaris Grid — modernizacja rozdzielnicy SN
-              </div>
-              <div className="text-[11px] text-indigo-200 font-mono flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 shrink-0" />
-                <span>Następny krok: 21.11 · Omówienie warunków umowy</span>
-              </div>
-            </div>
-          )}
 
-          <div className="rounded-lg p-3 bg-[#182238] border border-slate-700/70 space-y-1.5">
-            <div className="flex items-center justify-between font-mono text-[10px] text-slate-300">
-              <span>DEAL-198</span>
-              <span>Velo Auto</span>
-            </div>
-            <div className="text-xs font-medium text-white">Wynajem długoterminowy 12 aut serwisowych</div>
-            <div className="text-[11px] text-amber-200 font-mono">
-              Wymaga uwagi: brak kontaktu 21 dni
-            </div>
-          </div>
-        </div>
+              {/* Zadanie powstałe automatycznie z następnego kroku */}
+              {isTaskCreated ? (
+                <div className="rounded-lg p-2.5 bg-emerald-950/35 border border-emerald-500/60 space-y-1 animate-panel-in shadow-md">
+                  <div className="flex items-center justify-between font-mono text-[10px] text-emerald-300">
+                    <span className="font-semibold flex items-center gap-1">
+                      <Check className="w-3 h-3" /> Następny krok jako zadanie
+                    </span>
+                    <span>Termin: 21.11</span>
+                  </div>
+                  <div className="text-xs font-semibold text-white">
+                    Solaris Grid: Omówienie warunków umowy i akceptacja wyceny
+                  </div>
+                  <div className="text-[11px] text-slate-300 font-mono">
+                    Przypisany: Piotr Zieliński · Widok »Moja praca«
+                  </div>
+                </div>
+              ) : (
+                <div className="rounded-lg p-2.5 bg-[#101726] border border-slate-800 text-[11px] text-slate-400">
+                  Przesuń szansę, aby wygenerować zadanie w widoku handlowca...
+                </div>
+              )}
 
-        {/* Kolumna 3: Oś aktywności i powiązana osoba w wielu firmach */}
-        <div className="rounded-xl bg-[#141C2E] border border-slate-800 p-3 flex flex-col justify-between space-y-3">
-          <div className="space-y-2.5">
-            <div className="border-b border-slate-800 pb-2 flex items-center justify-between text-xs">
-              <span className="font-semibold text-white">Oś aktywności · Solaris Grid</span>
-              <span className="font-mono text-[10px] text-slate-300">CRM-03</span>
-            </div>
-
-            {callLogged && (
-              <div className="rounded-lg p-2.5 bg-emerald-950/35 border border-emerald-500/50 space-y-1">
-                <div className="flex items-center justify-between font-mono text-[10px] text-emerald-300">
+              {/* Wpis w osi aktywności */}
+              <div className="rounded-lg p-2.5 bg-[#101726] border border-slate-800 space-y-1">
+                <div className="flex items-center justify-between font-mono text-[10px] text-indigo-300">
                   <span className="inline-flex items-center gap-1 font-semibold">
                     <Phone className="w-3 h-3" /> Rozmowa telefoniczna
                   </span>
                   <span>Przed chwilą</span>
                 </div>
-                <div className="text-[11px] text-white">
-                  Potwierdzono zakres techniczny rozdzielnicy i termin spotkania na 21.11.
+                <div className="text-[11px] text-slate-200">
+                  Potwierdzono zakres techniczny rozdzielnicy SN i ustalono termin spotkania na 21.11.
                 </div>
               </div>
-            )}
 
-            <div className="rounded-lg p-2.5 bg-[#101726] border border-slate-800 space-y-1">
-              <div className="font-mono text-[10px] text-slate-300">Osoba kontaktowa (w 2 firmach)</div>
-              <div className="text-xs font-medium text-white">Tomasz Krawczyk</div>
-              <div className="text-[11px] text-slate-300">
-                1. Solaris Grid sp. z o.o. (Dyrektor Techniczny)
-                <br />
-                2. Solaris Inwestycje sp. z o.o. (Prokurent)
+              <div className="rounded-lg p-2 bg-[#0E1422] border border-slate-800/80 text-[10px] font-mono text-slate-400">
+                Osoba: Tomasz Krawczyk (Solaris Grid sp. z o.o. + Prokurent w Solaris Inwestycje)
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <MockupStoryFooter
+        steps={M2_STEPS}
+        currentStepIndex={step}
+        progress={progress}
+        isPaused={isPaused}
+        onSelectStep={selectStep}
+      />
     </div>
   );
 }
 
-/**
- * M3 — Praca: Kanban i checklista:
- * Zadanie przeciągnięte do „W toku”. Checklista odhacza się pozycja po pozycji,
- * pasek postępu etapu rośnie. Komentarz z @wzmianką. W rogu telefon z powiadomieniem push.
- */
+/* =========================================================================
+ * M3 — Praca: Kanban, Checklista i Push PWA (3 kroki narracji)
+ * ========================================================================= */
+
+const M3_STEPS: StoryStep[] = [
+  {
+    id: 'kanban_drag',
+    label: '1. Przeciągnięto do W toku',
+    narrative: 'Zadanie TSK-119 zostaje przeciągnięte do »W toku«, uruchamiając etap pomiarów stacji transformatorowej.',
+  },
+  {
+    id: 'checklist_done',
+    label: '2. Checklista krok po kroku',
+    narrative: 'Kolejne pozycje checklisty pomiarowej odhaczają się, a pasek postępu etapu rośnie z 50% do 100%.',
+  },
+  {
+    id: 'mention_push',
+    label: '3. @wzmianka i Push PWA',
+    narrative: 'Komentarz z @wzmianką natychmiast wyzwala powiadomienie push PWA na telefonie kierownika projektu.',
+  },
+];
+
 export function MockupM3ProjectsAndCalendar() {
-  const { containerRef, step, selectStepManually } = useViewportLoop(3, 2700, 2);
+  const {
+    containerRef,
+    step,
+    progress,
+    isPaused,
+    reducedMotion,
+    selectStep,
+    onMouseEnter,
+    onMouseLeave,
+  } = useStoryLoop({
+    steps: M3_STEPS,
+    stepDurationMs: 4600,
+    defaultReducedStep: 2,
+  });
 
   const progressPct = step === 0 ? 50 : step === 1 ? 75 : 100;
 
   return (
     <div
       ref={containerRef}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       role="region"
       aria-label="Makieta M3: Kanban zadań, checklista, komentarz z @wzmianką i powiadomienie push"
-      className="rounded-2xl border border-slate-700/80 bg-[#0F1523] text-slate-100 p-4 sm:p-5 shadow-2xl space-y-4"
+      className="rounded-2xl border border-slate-700/80 bg-[#0F1523] text-slate-100 shadow-2xl overflow-hidden select-none"
     >
-      <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 bg-[#0B0F17] border-b border-slate-800">
         <div>
           <div className="text-xs font-semibold text-white">
             Projekt: Uruchomienie stacji transformatorowej · Etap II (Aurora Energy)
           </div>
-          <div className="text-[11px] text-slate-300">
+          <div className="text-[11px] text-slate-400">
             Projekty → Etapy → Zadania → Podzadania → Checklisty · Komentarze z @wzmiankami
           </div>
         </div>
-        <div className="flex flex-wrap gap-1.5">
-          {(['1. Przeciągnięto do W toku', '2. Checklista 75%', '3. @wzmianka + Push PWA'] as const).map(
-            (label, idx) => (
-              <button
-                key={label}
-                type="button"
-                onClick={() => selectStepManually(idx)}
-                className={`px-2 py-1 rounded font-mono text-[10px] ${
-                  step === idx ? 'bg-[#3554F2] text-white' : 'bg-slate-800 text-slate-300'
-                }`}
-              >
-                {label}
-              </button>
-            )
-          )}
-        </div>
+        <span className="font-mono text-[10px] text-emerald-300">
+          Etap aktywny: 100% w terminie
+        </span>
       </div>
 
-      {/* Pasek postępu etapu */}
-      <div className="rounded-xl bg-[#141C2E] border border-slate-800 p-3 space-y-2">
-        <div className="flex items-center justify-between text-xs">
-          <span className="font-semibold text-white">Postęp etapu: Próby i pomiary odbiorowe</span>
-          <span className="font-mono text-xs text-emerald-300 tabular-nums">{progressPct}%</span>
+      <div className="p-4 sm:p-5 space-y-4">
+        {/* Pasek postępu etapu */}
+        <div className="rounded-xl bg-[#141C2E] border border-slate-800 p-3 space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-semibold text-white">Postęp etapu: Próby i pomiary odbiorowe</span>
+            <span className="font-mono text-xs text-emerald-300 tabular-nums font-semibold">
+              {progressPct}%
+            </span>
+          </div>
+          <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+            <div
+              className="h-full bg-emerald-400 transition-all duration-500 ease-out"
+              style={{ width: `${progressPct}%` }}
+            />
+          </div>
         </div>
-        <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
-          <div
-            className="h-full bg-emerald-400 transition-all duration-500"
-            style={{ width: `${progressPct}%` }}
-          />
-        </div>
-      </div>
 
-      <div className="grid lg:grid-cols-12 gap-4 items-start">
-        {/* Kanban + Checklista */}
-        <div className="lg:col-span-8 grid sm:grid-cols-2 gap-3">
-          {/* Kolumna: W toku */}
-          <div className="rounded-xl bg-[#141C2E] border border-indigo-500/50 p-3 space-y-2.5">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-2 text-xs">
-              <span className="font-semibold text-white flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-sky-400" /> W toku
-              </span>
-              <span className="font-mono text-[10px] text-indigo-300">Przeciągnięto</span>
+        <div className="grid lg:grid-cols-12 gap-4 items-start">
+          {/* Kanban + Checklista */}
+          <div className="lg:col-span-8 grid sm:grid-cols-2 gap-3">
+            <div className="rounded-xl bg-[#141C2E] border border-indigo-500/50 p-3 space-y-2.5">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-2 text-xs">
+                <span className="font-semibold text-white flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-sky-400" /> W toku
+                </span>
+                <span className="font-mono text-[10px] text-indigo-300">Zadanie przypisane</span>
+              </div>
+
+              <div className="rounded-lg bg-[#182238] border border-indigo-400/60 p-3 space-y-2.5 shadow-md">
+                <div className="flex items-center justify-between font-mono text-[10px]">
+                  <span className="text-slate-300">TSK-119 · Priorytet: Wysoki</span>
+                  <span className="px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-200">W toku</span>
+                </div>
+                <div className="text-xs font-semibold text-white">
+                  Pomiary ochronne i próby funkcjonalne rozdzielnicy
+                </div>
+
+                <div className="space-y-1.5 pt-1">
+                  {[
+                    { label: 'Sprawdzenie ciągłości przewodów ochronnych', done: true },
+                    { label: 'Pomiar rezystancji izolacji torów SN', done: true },
+                    { label: 'Test wyzwalaczy zabezpieczeń nadprądowych', done: step >= 1 },
+                    { label: 'Kompletacja załączników pomiarowych do odbioru', done: step >= 2 },
+                  ].map((item) => (
+                    <div
+                      key={item.label}
+                      className="flex items-center gap-2 px-2 py-1 rounded bg-[#101726] border border-slate-800 text-[11px] transition-colors"
+                    >
+                      <span
+                        className={`w-3.5 h-3.5 rounded flex items-center justify-center text-[9px] shrink-0 transition-colors ${
+                          item.done
+                            ? 'bg-emerald-400 text-slate-950 font-bold'
+                            : 'border border-slate-600 text-transparent'
+                        }`}
+                      >
+                        ✓
+                      </span>
+                      <span className={item.done ? 'line-through text-slate-400' : 'text-white'}>
+                        {item.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
 
-            <div className="rounded-lg bg-[#182238] border border-indigo-400/60 p-3 space-y-2.5 shadow-md">
-              <div className="flex items-center justify-between font-mono text-[10px]">
-                <span className="text-slate-300">TSK-119 · Priorytet: Wysoki</span>
-                <span className="px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-200">W toku</span>
+            {/* Komentarze zadania */}
+            <div className="rounded-xl bg-[#141C2E] border border-slate-800 p-3 space-y-3">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-2 text-xs">
+                <span className="font-semibold text-white flex items-center gap-1.5">
+                  <MessageSquare className="w-3.5 h-3.5 text-indigo-300" /> Komentarze zadania
+                </span>
+                <span className="font-mono text-[10px] text-slate-400">Aktywność</span>
+              </div>
+
+              <div className="rounded-lg bg-[#101726] border border-slate-800 p-3 space-y-1.5 text-xs">
+                <div className="flex items-center justify-between text-[10px] font-mono text-slate-400">
+                  <span>Piotr Zieliński</span>
+                  <span>14:20</span>
+                </div>
+                <p className="text-slate-200 leading-relaxed">
+                  <span className="px-1.5 py-0.5 rounded bg-indigo-500/30 text-indigo-200 font-mono text-[11px]">
+                    @Karolina Nowak
+                  </span>{' '}
+                  pomiary rezystancji zakończone bez uwag, protokół wgrany do folderu projektu.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Telefon z powiadomieniem Push (PWA) */}
+          <div className="lg:col-span-4 rounded-2xl bg-[#0B0F17] border-2 border-slate-700 p-3.5 shadow-xl space-y-2.5">
+            <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 border-b border-slate-800 pb-2">
+              <span className="inline-flex items-center gap-1 text-indigo-300">
+                <Smartphone className="w-3.5 h-3.5" /> Telefon · PWA Push
+              </span>
+              <span>09:41</span>
+            </div>
+            <div className="rounded-xl bg-[#162038] border border-indigo-400/60 p-3 space-y-1.5 shadow-md">
+              <div className="flex items-center justify-between text-[10px] font-mono text-indigo-200">
+                <span className="inline-flex items-center gap-1 font-semibold">
+                  <Bell className="w-3 h-3" /> GroupOS · Powiadomienie
+                </span>
+                <span>Teraz</span>
               </div>
               <div className="text-xs font-semibold text-white">
-                Pomiary ochronne i próby funkcjonalne rozdzielnicy
+                Piotr Zieliński oznaczył Cię w TSK-119
               </div>
-
-              {/* Checklista odhaczająca się pozycja po pozycji */}
-              <div className="space-y-1.5 pt-1">
-                {[
-                  { label: 'Sprawdzenie ciągłości przewodów ochronnych', done: true },
-                  { label: 'Pomiar rezystancji izolacji torów SN', done: true },
-                  { label: 'Test wyzwalaczy zabezpieczeń nadprądowych', done: step >= 1 },
-                  { label: 'Kompletacja załączników pomiarowych do odbioru', done: step >= 2 },
-                ].map((item) => (
-                  <div
-                    key={item.label}
-                    className="flex items-center gap-2 px-2 py-1 rounded bg-[#101726] border border-slate-800 text-[11px]"
-                  >
-                    <span
-                      className={`w-3.5 h-3.5 rounded flex items-center justify-center text-[9px] shrink-0 ${
-                        item.done
-                          ? 'bg-emerald-400 text-slate-950 font-bold'
-                          : 'border border-slate-600 text-transparent'
-                      }`}
-                    >
-                      ✓
-                    </span>
-                    <span className={item.done ? 'line-through text-slate-300' : 'text-white'}>
-                      {item.label}
-                    </span>
-                  </div>
-                ))}
+              <div className="text-[11px] text-slate-200">
+                „@Karolina Nowak pomiary rezystancji zakończone bez uwag...”
               </div>
-            </div>
-          </div>
-
-          {/* Komentarz z @wzmianką */}
-          <div className="rounded-xl bg-[#141C2E] border border-slate-800 p-3 space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-2 text-xs">
-              <span className="font-semibold text-white flex items-center gap-1.5">
-                <MessageSquare className="w-3.5 h-3.5 text-indigo-300" /> Komentarze zadania
-              </span>
-              <span className="font-mono text-[10px] text-slate-300">COL-01</span>
-            </div>
-
-            <div className="rounded-lg bg-[#101726] border border-slate-800 p-3 space-y-1.5 text-xs">
-              <div className="flex items-center justify-between text-[10px] font-mono text-slate-300">
-                <span>Piotr Zieliński</span>
-                <span>14:20</span>
-              </div>
-              <p className="text-slate-200 leading-relaxed">
-                <span className="px-1.5 py-0.5 rounded bg-indigo-500/30 text-indigo-200 font-mono text-[11px]">
-                  @Karolina Nowak
-                </span>{' '}
-                pomiary rezystancji zakończone bez uwag, protokół wgrany do folderu projektu.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* W rogu telefon z powiadomieniem push (PWA) */}
-        <div className="lg:col-span-4 rounded-2xl bg-[#0B0F17] border-2 border-slate-700 p-3.5 shadow-xl space-y-2.5">
-          <div className="flex items-center justify-between text-[10px] font-mono text-slate-300 border-b border-slate-800 pb-2">
-            <span className="inline-flex items-center gap-1 text-indigo-300">
-              <Smartphone className="w-3.5 h-3.5" /> Telefon · PWA Push
-            </span>
-            <span>09:41</span>
-          </div>
-          <div className="rounded-xl bg-[#162038] border border-indigo-400/60 p-3 space-y-1.5 shadow-md">
-            <div className="flex items-center justify-between text-[10px] font-mono text-indigo-200">
-              <span className="inline-flex items-center gap-1 font-semibold">
-                <Bell className="w-3 h-3" /> GroupOS · Powiadomienie
-              </span>
-              <span>Teraz</span>
-            </div>
-            <div className="text-xs font-semibold text-white">
-              Piotr Zieliński oznaczył Cię w TSK-119
-            </div>
-            <div className="text-[11px] text-slate-200">
-              „@Karolina Nowak pomiary rezystancji zakończone bez uwag...”
             </div>
           </div>
         </div>
       </div>
+
+      <MockupStoryFooter
+        steps={M3_STEPS}
+        currentStepIndex={step}
+        progress={progress}
+        isPaused={isPaused}
+        onSelectStep={selectStep}
+      />
     </div>
   );
 }
 
-/**
- * M4 — Dokumenty i umowy:
- * Drzewo folderów (podmiot → projekt). Plik oznaczony „Poufne”, po pobraniu pojawia się
- * wpis w dzienniku audytu. W rejestrze umów alert „Umowa najmu wygasa za 30 dni”.
- */
+/* =========================================================================
+ * M4 — Dokumenty i umowy (4 kroki narracji)
+ * 13. Umowy (M4) — „termin nie umyka”:
+ * oś czasu umowy przesuwa się do „30 dni do końca” → zapala się alert →
+ * ten sam sygnał pojawia się na pulpicie grupy (spina M4 z M1).
+ * ========================================================================= */
+
+const M4_STEPS: StoryStep[] = [
+  {
+    id: 'folder_tree',
+    label: '1. Drzewo i plik Poufne',
+    narrative: 'Repozytorium organizuje pliki per podmiot i projekt: Aneks_cenowy_Solaris.pdf oznaczony jest jako »Poufne«.',
+  },
+  {
+    id: 'audit_download',
+    label: '2. Audyt pobrania (SHA-256)',
+    narrative: 'Po pobraniu pliku poufnego w dzienniku audytu natychmiast pojawia się wpis ze sumą SHA-256 i czasem operacji.',
+  },
+  {
+    id: 'timeline_30d',
+    label: '3. Alert: 30 dni do końca',
+    narrative: 'Oś czasu umowy przesuwa się do progu 30 dni: system automatycznie zapala ostrzeżenie o wygasaniu kontraktu.',
+  },
+  {
+    id: 'sync_dashboard',
+    label: '4. Sygnał na pulpicie grupy',
+    narrative: 'Ten sam alert natychmiast zasila pulpit zarządu grupy: CTR-018 trafia do sygnałów wymagających uwagi (spina z M1).',
+  },
+];
+
 export function MockupM4ContractsAndRisks() {
-  const { containerRef, step, selectStepManually } = useViewportLoop(3, 2800, 2);
+  const {
+    containerRef,
+    step,
+    progress,
+    isPaused,
+    reducedMotion,
+    selectStep,
+    onMouseEnter,
+    onMouseLeave,
+  } = useStoryLoop({
+    steps: M4_STEPS,
+    stepDurationMs: 4600,
+    defaultReducedStep: 2,
+  });
 
   const fileDownloaded = step >= 1;
+  const isAlertActive = step >= 2;
+  const isSyncedToM1 = step === 3;
 
   return (
     <div
       ref={containerRef}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       role="region"
-      aria-label="Makieta M4: Drzewo folderów, poufne pliki z dziennikiem audytu i rejestr umów"
-      className="rounded-2xl border border-slate-700/80 bg-[#0F1523] text-slate-100 p-4 sm:p-5 shadow-2xl space-y-4"
+      aria-label="Makieta M4: Drzewo folderów, poufne pliki z audytem, alert umowy 30 dni i spięcie z pulpitem grupy"
+      className="rounded-2xl border border-slate-700/80 bg-[#0F1523] text-slate-100 shadow-2xl overflow-hidden select-none"
     >
-      <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 bg-[#0B0F17] border-b border-slate-800">
         <div>
           <div className="text-xs font-semibold text-white">
             Repozytorium dokumentów, klasyfikacja „Poufne” i rejestr umów
           </div>
-          <div className="text-[11px] text-slate-300">
-            Drzewo folderów (podmiot → projekt) · Suma kontrolna SHA-256 · Dziennik audytu pobrań
+          <div className="text-[11px] text-slate-400">
+            Drzewo folderów · Suma kontrolna SHA-256 · Rejestr umów spięty z pulpitem zarządu
           </div>
         </div>
-        <div className="flex flex-wrap gap-1.5">
-          {(['1. Drzewo folderów', '2. Pobranie pliku Poufne', '3. Alert umowy 30 dni'] as const).map(
-            (label, idx) => (
-              <button
-                key={label}
-                type="button"
-                onClick={() => selectStepManually(idx)}
-                className={`px-2 py-1 rounded font-mono text-[10px] ${
-                  step === idx ? 'bg-[#3554F2] text-white' : 'bg-slate-800 text-slate-300'
-                }`}
-              >
-                {label}
-              </button>
-            )
-          )}
-        </div>
+        <span className="font-mono text-[10px] text-indigo-300">
+          Rejestr ryzyk i umów
+        </span>
       </div>
 
-      <div className="grid lg:grid-cols-12 gap-4">
-        {/* Drzewo folderów: podmiot → projekt */}
-        <div className="lg:col-span-5 rounded-xl bg-[#141C2E] border border-slate-800 p-3.5 space-y-2 text-xs">
-          <div className="font-mono text-[10px] uppercase tracking-wider text-slate-300 pb-1 border-b border-slate-800">
-            Struktura folderów
-          </div>
-          <div className="space-y-1.5 font-mono text-[11px]">
-            <div className="flex items-center gap-2 text-indigo-200 font-semibold">
-              <FolderOpen className="w-4 h-4 text-indigo-300 shrink-0" />
-              <span>Aurora Energy sp. z o.o. (Podmiot)</span>
+      <div className="p-4 sm:p-5 space-y-4">
+        <div className="grid lg:grid-cols-12 gap-4">
+          {/* Drzewo folderów: podmiot → projekt */}
+          <div className="lg:col-span-5 rounded-xl bg-[#141C2E] border border-slate-800 p-3.5 space-y-2 text-xs">
+            <div className="font-mono text-[10px] uppercase tracking-wider text-slate-400 pb-1 border-b border-slate-800">
+              Struktura folderów organizacji
             </div>
-            <div className="pl-5 space-y-1.5">
-              <div className="flex items-center gap-2 text-white">
-                <FolderOpen className="w-3.5 h-3.5 text-sky-300 shrink-0" />
-                <span>PRJ-042 · Rozdzielnica SN (Projekt)</span>
+            <div className="space-y-1.5 font-mono text-[11px]">
+              <div className="flex items-center gap-2 text-indigo-200 font-semibold">
+                <FolderOpen className="w-4 h-4 text-indigo-300 shrink-0" />
+                <span>Aurora Energy sp. z o.o. (Podmiot)</span>
               </div>
               <div className="pl-5 space-y-1.5">
-                <div className="flex items-center justify-between gap-2 p-2 rounded-lg bg-[#182238] border border-rose-500/40">
-                  <span className="flex items-center gap-1.5 text-white truncate">
-                    <FileText className="w-3.5 h-3.5 text-rose-300 shrink-0" />
-                    <span className="truncate">Aneks_cenowy_Solaris.pdf</span>
-                  </span>
-                  <span className="px-1.5 py-0.5 rounded bg-rose-500/25 text-rose-200 text-[10px] shrink-0">
-                    Poufne
-                  </span>
+                <div className="flex items-center gap-2 text-white">
+                  <FolderOpen className="w-3.5 h-3.5 text-sky-300 shrink-0" />
+                  <span>PRJ-042 · Rozdzielnica SN (Projekt)</span>
+                </div>
+                <div className="pl-5 space-y-1.5">
+                  <div className="flex items-center justify-between gap-2 p-2 rounded-lg bg-[#182238] border border-rose-500/40">
+                    <span className="flex items-center gap-1.5 text-white truncate">
+                      <FileText className="w-3.5 h-3.5 text-rose-300 shrink-0" />
+                      <span className="truncate">Aneks_cenowy_Solaris.pdf</span>
+                    </span>
+                    <span className="px-1.5 py-0.5 rounded bg-rose-500/25 text-rose-200 text-[10px] shrink-0 font-semibold">
+                      Poufne
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 text-slate-400 pt-1">
+                <Folder className="w-4 h-4 text-slate-400 shrink-0" />
+                <span>Nord Events sp. z o.o. (Podmiot)</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Dziennik audytu + Rejestr umów */}
+          <div className="lg:col-span-7 space-y-3">
+            {/* Wpis w dzienniku audytu */}
+            <div className="rounded-xl bg-[#141C2E] border border-slate-800 p-3.5 space-y-2">
+              <div className="flex items-center justify-between text-xs border-b border-slate-800 pb-2">
+                <span className="font-semibold text-white flex items-center gap-1.5">
+                  <Download className="w-3.5 h-3.5 text-indigo-300" /> Dziennik audytu pobrań i zmian
+                </span>
+                <span className="font-mono text-[10px] text-slate-400">SHA-256 zweryfikowano</span>
+              </div>
+              <div
+                className={`rounded-lg p-2.5 border text-xs transition-colors duration-300 ${
+                  fileDownloaded
+                    ? 'bg-indigo-950/35 border-indigo-400/60 text-white'
+                    : 'bg-[#101726] border-slate-800 text-slate-400'
+                }`}
+              >
+                <div className="flex items-center justify-between font-mono text-[10px] text-indigo-200">
+                  <span>AUDIT-8841 · POBRANIE PLIKU POUFNEGO</span>
+                  <span>14:32:10</span>
+                </div>
+                <div className="mt-1 font-medium">
+                  Użytkownik Karolina Nowak pobrała plik „Aneks_cenowy_Solaris.pdf” (SHA-256: 9f86d...12a4)
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-2 text-slate-300 pt-1">
-              <Folder className="w-4 h-4 text-slate-400 shrink-0" />
-              <span>Nord Events sp. z o.o. (Podmiot)</span>
-            </div>
-          </div>
-        </div>
 
-        {/* Prawa kolumna: Dziennik audytu pobrań + Alert w rejestrze umów */}
-        <div className="lg:col-span-7 space-y-3">
-          {/* Wpis w dzienniku audytu po pobraniu pliku Poufne */}
-          <div className="rounded-xl bg-[#141C2E] border border-slate-800 p-3.5 space-y-2">
-            <div className="flex items-center justify-between text-xs border-b border-slate-800 pb-2">
-              <span className="font-semibold text-white flex items-center gap-1.5">
-                <Download className="w-3.5 h-3.5 text-indigo-300" /> Dziennik audytu pobrań i zmian
-              </span>
-              <span className="font-mono text-[10px] text-slate-300">SHA-256 zweryfikowano</span>
-            </div>
+            {/* Rejestr umów z alertem 30 dni */}
             <div
-              className={`rounded-lg p-2.5 border text-xs transition-colors ${
-                fileDownloaded
-                  ? 'bg-indigo-950/35 border-indigo-400/60 text-white'
-                  : 'bg-[#101726] border-slate-800 text-slate-300'
+              className={`rounded-xl border p-3.5 flex flex-wrap items-center justify-between gap-3 text-xs transition-all duration-300 ${
+                isAlertActive
+                  ? 'bg-[#182136] border-amber-500/70 shadow-lg'
+                  : 'bg-[#12192B] border-slate-800'
               }`}
             >
-              <div className="flex items-center justify-between font-mono text-[10px] text-indigo-200">
-                <span>AUDIT-8841 · POBRANIE PLIKU POUFNEGO</span>
-                <span>14:32:10</span>
+              <div className="flex items-start gap-2.5">
+                <ShieldAlert
+                  className={`w-4 h-4 shrink-0 mt-0.5 ${
+                    isAlertActive ? 'text-amber-300 animate-pulse' : 'text-slate-500'
+                  }`}
+                />
+                <div>
+                  <div className="font-semibold text-white">
+                    Rejestr umów: Umowa najmu magazynu centralnego (Nord Events)
+                  </div>
+                  <div className="text-[11px] text-slate-400 mt-0.5">
+                    Oś czasu wygasania: 30 dni do końca kontraktu · Wymaga decyzji o przedłużeniu
+                  </div>
+                </div>
               </div>
-              <div className="mt-1 font-medium">
-                Użytkownik Karolina Nowak pobrała plik „Aneks_cenowy_Solaris.pdf” (SHA-256: 9f86d08...12a4)
-              </div>
+              <span
+                className={`font-mono text-[10px] px-2.5 py-1 rounded font-semibold border ${
+                  isAlertActive
+                    ? 'bg-amber-500/25 text-amber-200 border-amber-400/50'
+                    : 'bg-slate-800 text-slate-400 border-slate-700'
+                }`}
+              >
+                Alert 30 dni wygasania
+              </span>
             </div>
-          </div>
 
-          {/* Rejestr umów z alertem 30 dni */}
-          <div className="rounded-xl bg-[#161F33] border border-amber-500/50 p-3.5 flex flex-wrap items-center justify-between gap-3 text-xs">
-            <div className="flex items-start gap-2.5">
-              <ShieldAlert className="w-4 h-4 text-amber-300 shrink-0 mt-0.5" />
-              <div>
-                <div className="font-semibold text-white">
-                  Alert rejestru umów: Umowa najmu wygasa za 30 dni
+            {/* Sygnał spięty z pulpitem grupy (spina z M1) */}
+            {isSyncedToM1 && (
+              <div className="rounded-xl bg-[#101726] border border-indigo-500/50 p-3 text-xs space-y-1.5 animate-panel-in">
+                <div className="flex items-center justify-between font-mono text-[10px] text-indigo-300">
+                  <span>WIDOK ZARZĄDU · SYGNAŁ PRZEKAZANY DO M1</span>
+                  <span>Aktywny alert grupy</span>
                 </div>
-                <div className="text-[11px] text-slate-300 mt-0.5">
-                  Podmiot: Nord Events sp. z o.o. · Powiązane ryzyko: ciągłość magazynu scenografii
+                <div className="font-semibold text-white flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-amber-400" />
+                  <span>CTR-018: Umowa najmu magazynu centralnego wygasa za 30 dni</span>
+                </div>
+                <div className="text-[11px] text-slate-400">
+                  Ten sam sygnał pojawia się na zagregowanym pulpicie prezesa grupy w sekcji „Sygnały wymagające uwagi”.
                 </div>
               </div>
-            </div>
-            <span className="font-mono text-[10px] px-2.5 py-1 rounded bg-amber-500/25 text-amber-200 border border-amber-400/40 font-semibold">
-              Umowa najmu wygasa za 30 dni
-            </span>
+            )}
           </div>
         </div>
       </div>
+
+      <MockupStoryFooter
+        steps={M4_STEPS}
+        currentStepIndex={step}
+        progress={progress}
+        isPaused={isPaused}
+        onSelectStep={selectStep}
+      />
     </div>
   );
 }
 
-/**
- * M6 — Hosting: SaaS vs dedykowany VPS (Diagram SVG):
- * Model współdzielony w UE vs dedykowany serwer klienta w UE (osobna baza, backup, kłódka).
- * Przepływy danych nie wychodzą poza granicę UE.
- */
+/* =========================================================================
+ * M6 — Hosting: SaaS vs Dedykowany VPS (Wektorowy diagram SVG)
+ * ========================================================================= */
 export function MockupM6SecurityDiagram() {
   return (
     <div
       role="img"
       aria-label="Diagram M6: Porównanie modelu współdzielonego w UE (SaaS) oraz dedykowanego serwera klienta w UE (VPS). Przepływy danych nie wychodzą poza granicę UE."
-      className="rounded-2xl border border-slate-700/80 bg-[#0D1320] p-4 sm:p-6 shadow-2xl space-y-4"
+      className="rounded-2xl border border-slate-700/80 bg-[#0D1320] p-4 sm:p-6 shadow-2xl space-y-4 select-none"
     >
       <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800">
         <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-white">
@@ -1167,7 +1716,7 @@ export function MockupM6SecurityDiagram() {
               <span className="font-mono text-[11px] uppercase tracking-wider text-indigo-300">
                 Model 02 · Dedykowany VPS w UE
               </span>
-              <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-indigo-500/30 text-indigo-100 border border-indigo-400/40">
+              <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-indigo-500/30 text-indigo-100 border border-indigo-400/40 font-semibold">
                 Fizyczna separacja serwera i bazy
               </span>
             </div>
@@ -1195,7 +1744,6 @@ export function MockupM6SecurityDiagram() {
               GRANICA UE (EOG) · DEDYKOWANY SERWER TWOJEJ GRUPY
             </text>
 
-            {/* Ikona kłódki w SVG */}
             <rect x="366" y="22" width="24" height="20" rx="4" fill="#1E293B" stroke="#34D399" />
             <text x="373" y="36" fill="#34D399" fontSize="11" fontWeight="bold">
               🔒
@@ -1264,47 +1812,61 @@ export function MockupM6SecurityDiagram() {
   );
 }
 
-/**
- * M7 — Teaser branżowy (wkrótce):
- * Telefon brygadzisty: zadanie „Montaż tras kablowych — piętro 3” → zdjęcie → checklista → „Zgłoś do odbioru”.
- * Wyszarzony, z etykietą „Wkrótce: beta”.
- */
-export function MockupM7SubcontractorLoop() {
-  const { containerRef, step, selectStepManually } = useViewportLoop(4, 2400, 3);
+/* =========================================================================
+ * M7 — Teaser branżowy: Podwykonawcy (4 kroki narracji)
+ * ========================================================================= */
 
-  const steps = [
-    {
-      id: 'task',
-      label: '1. Zadanie dla ekipy',
-      detail: 'Montaż tras kablowych — piętro 3',
-    },
-    {
-      id: 'photo',
-      label: '2. Zdjęcie z budowy',
-      detail: 'Dodano 4 zdjęcia przed zakryciem bruzd (znacznik czasu i autora)',
-    },
-    {
-      id: 'checklist',
-      label: '3. Checklista etapu',
-      detail: '✓ Uchwyt ognioodporny co 60 cm · ✓ Oznaczenie obwodów',
-    },
-    {
-      id: 'submit',
-      label: '4. Zgłoś do odbioru',
-      detail: 'Gotowe do protokołu odbioru i fakturowania etapu',
-    },
-  ];
+const M7_STEPS: StoryStep[] = [
+  {
+    id: 'task',
+    label: '1. Zadanie dla ekipy',
+    narrative: 'Brygadzista otrzymuje zadanie na telefon: »Montaż tras kablowych — piętro 3« powiązane z umową i projektem.',
+  },
+  {
+    id: 'photo',
+    label: '2. Zdjęcia z budowy',
+    narrative: 'Dodanie 4 zdjęć z budowy przed zakryciem bruzd: system rejestruje geolokalizację, autora i sumę kontrolną.',
+  },
+  {
+    id: 'checklist',
+    label: '3. Checklista etapu',
+    narrative: 'Odhaczenie punktów kontrolnych: uchwyty ognioodporne co 60 cm i oznaczenie obwodów zrealizowane.',
+  },
+  {
+    id: 'submit',
+    label: '4. Zgłoś do odbioru',
+    narrative: 'Zgłoszenie do protokołu odbioru: kierownik budowy otrzymuje powiadomienie, a etap jest gotowy do fakturowania.',
+  },
+];
+
+export function MockupM7SubcontractorLoop() {
+  const {
+    containerRef,
+    step,
+    progress,
+    isPaused,
+    reducedMotion,
+    selectStep,
+    onMouseEnter,
+    onMouseLeave,
+  } = useStoryLoop({
+    steps: M7_STEPS,
+    stepDurationMs: 4400,
+    defaultReducedStep: 3,
+  });
 
   return (
     <div
       ref={containerRef}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       role="region"
-      aria-label="Makieta M7: Wyszarzony podgląd telefonu brygadzisty (Wkrótce: beta) — Montaż tras kablowych — piętro 3"
-      className="rounded-xl border border-slate-700/80 bg-[#0E131F]/90 p-4 text-slate-200 shadow-lg opacity-90"
+      aria-label="Makieta M7: Podgląd telefonu brygadzisty (Wkrótce: beta) — Montaż tras kablowych — piętro 3"
+      className="rounded-xl border border-slate-700/80 bg-[#0E131F]/90 text-slate-200 shadow-lg overflow-hidden select-none"
     >
-      <div className="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-800">
+      <div className="flex flex-wrap items-center justify-between gap-2 p-3.5 border-b border-slate-800 bg-[#0B0F17]">
         <div className="flex items-center gap-2">
-          <Smartphone className="w-4 h-4 text-slate-300" />
+          <Smartphone className="w-4 h-4 text-slate-400" />
           <span className="font-mono text-xs text-slate-200 font-semibold">
             Widok telefonu brygadzisty: „Montaż tras kablowych — piętro 3”
           </span>
@@ -1314,34 +1876,43 @@ export function MockupM7SubcontractorLoop() {
         </span>
       </div>
 
-      {/* Symulowany ekran telefonu brygadzisty w stonowanej/wyszarzonej stylistyce */}
-      <div className="grid sm:grid-cols-4 gap-2.5">
-        {steps.map((s, idx) => {
-          const isActive = step === idx;
-          return (
-            <button
-              key={s.id}
-              type="button"
-              onClick={() => selectStepManually(idx)}
-              className={`text-left rounded-lg p-3 border transition-all flex flex-col justify-between ${
-                isActive
-                  ? 'bg-slate-800/90 border-slate-500 text-white'
-                  : 'bg-[#111726]/80 border-slate-800 text-slate-300'
-              }`}
-            >
-              <div className="space-y-1">
-                <div className="font-mono text-[10px] text-slate-300">{s.label}</div>
-                <div className="text-xs font-semibold text-white leading-snug">{s.detail}</div>
-              </div>
-              {idx === 3 && (
-                <div className="mt-2.5 inline-flex items-center justify-center px-2.5 py-1 rounded bg-slate-700 text-white font-mono text-[10px] font-semibold">
-                  Zgłoś do odbioru →
+      <div className="p-4">
+        <div className="grid sm:grid-cols-4 gap-2.5">
+          {M7_STEPS.map((s, idx) => {
+            const isActive = step === idx;
+            return (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => selectStep(idx)}
+                className={`text-left rounded-lg p-3 border transition-all flex flex-col justify-between ${
+                  isActive
+                    ? 'bg-slate-800/90 border-slate-500 text-white shadow-md'
+                    : 'bg-[#111726]/80 border-slate-800 text-slate-400'
+                }`}
+              >
+                <div className="space-y-1">
+                  <div className="font-mono text-[10px] text-slate-400">{s.label}</div>
+                  <div className="text-xs font-semibold text-white leading-snug">{s.narrative}</div>
                 </div>
-              )}
-            </button>
-          );
-        })}
+                {idx === 3 && (
+                  <div className="mt-2.5 inline-flex items-center justify-center px-2.5 py-1 rounded bg-indigo-600 text-white font-mono text-[10px] font-semibold">
+                    Zgłoś do odbioru →
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
       </div>
+
+      <MockupStoryFooter
+        steps={M7_STEPS}
+        currentStepIndex={step}
+        progress={progress}
+        isPaused={isPaused}
+        onSelectStep={selectStep}
+      />
     </div>
   );
 }

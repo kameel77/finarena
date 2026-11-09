@@ -207,3 +207,10 @@ Strony produktów w katalogu `/produkty/*` korzystają z odizolowanego układu (
    - obraz Open Graph 1200×630 (`/produkty/<slug>/opengraph-image`),
    - metadane SEO oraz dane strukturalne `SoftwareApplication` + `FAQPage`,
    - wpis w `sitemap.xml` (dla produktów z `noindex !== true`) oraz karta w katalogu `/produkty`.
+
+### Konfiguracja powiadomień e-mail (Lead Receiver):
+
+Dla endpointu `/api/products/lead`:
+- Na **stagingu** ustawiono zmienną środowiskową `GROUPOS_LEAD_RECEIVER=hello@finarena.pl` (Coolify).
+- Przed wdrożeniem na **produkcję** należy w ustawieniach aplikacji produkcyjnej w Coolify dodać tę samą zmienną:
+  - `GROUPOS_LEAD_RECEIVER=hello@finarena.pl` (oraz zweryfikować dane dostępowe `GMAIL_USER` / `GMAIL_APP_PASSWORD`).

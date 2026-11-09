@@ -64,7 +64,8 @@ export interface ProductReferenceItem {
   name: string;
   label: string;
   role: string;
-  logoSvg: 'east-gate-placeholder' | 'generic-placeholder';
+  logoSvg: 'east-gate' | 'east-gate-placeholder' | 'generic-placeholder';
+  logoPath?: string;
 }
 
 export interface ProductProblemCard {
@@ -142,7 +143,7 @@ export interface ProductConfig {
   shortDescription: string;
   category: string;
   noindex?: boolean;
-  demoBookingUrl: string;
+  demoBookingUrl?: string;
   contactRecipientEmail: string;
   theme: ProductTheme;
   seo: {

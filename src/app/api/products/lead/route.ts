@@ -203,26 +203,38 @@ export async function POST(req: Request) {
     const isDryRunHeader = req.headers.get('x-test-dry-run') === '1';
     const hasSmtpCredentials = Boolean(process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD);
 
-    if (isDryRunHeader || !hasSmtpCredentials) {
-      if (!hasSmtpCredentials) {
-        console.warn('[products/lead] Brak GMAIL_USER/GMAIL_APP_PASSWORD — zapisano zgłoszenie w trybie dry-run:', {
+    if (isDryRunHeader) {
+      return NextResponse.json(
+        {
+          ok: true,
+          message: 'Zgłoszenie zostało przyjęte (tryb testowy dry-run).',
+          formType,
+          h1Variant,
+          delivery: 'dry-run-header',
+        },
+        { status: 200 }
+      );
+    }
+
+    if (!hasSmtpCredentials) {
+      console.error(
+        '[products/lead] Błąd krytyczny: brak konfiguracji SMTP (GMAIL_USER / GMAIL_APP_PASSWORD). Formularz nie może wysłać leada:',
+        {
           subjectPrefix,
           name,
           email,
           company,
           formType,
           h1Variant,
-        });
-      }
+        }
+      );
       return NextResponse.json(
         {
-          ok: true,
-          message: 'Zgłoszenie zostało przyjęte.',
-          formType,
-          h1Variant,
-          delivery: hasSmtpCredentials ? 'dry-run-header' : 'dry-run-no-smtp',
+          ok: false,
+          message:
+            'Serwer pocztowy jest chwilowo niedostępny. Prosimy o bezpośredni kontakt mailowy na adres hello@finarena.pl.',
         },
-        { status: 200 }
+        { status: 503 }
       );
     }
 
