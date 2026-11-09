@@ -22,10 +22,27 @@ function checkRateLimit(ip: string): boolean {
   const now = Date.now();
   const timestamps = ipSubmissionTimestamps.get(ip) || [];
   const validTimestamps = timestamps.filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
-  if (validTimestamps.length >= RATE_LIMIT_MAX_SUBMISSIONS) {
+
+  // Czyszczenie wygasłych wpisów, aby mapa nie rosła w nieskończoność
+  if (validTimestamps.length === 0) {
+    ipSubmissionTimestamps.delete(ip);
+  } else {
     ipSubmissionTimestamps.set(ip, validTimestamps);
+  }
+
+  // Okresowe czyszczenie starych kluczy przy dużej liczbie IP
+  if (ipSubmissionTimestamps.size > 500) {
+    ipSubmissionTimestamps.forEach((storedTimestamps, storedIp) => {
+      if (storedTimestamps.every((t: number) => now - t >= RATE_LIMIT_WINDOW_MS)) {
+        ipSubmissionTimestamps.delete(storedIp);
+      }
+    });
+  }
+
+  if (validTimestamps.length >= RATE_LIMIT_MAX_SUBMISSIONS) {
     return false;
   }
+
   validTimestamps.push(now);
   ipSubmissionTimestamps.set(ip, validTimestamps);
   return true;
@@ -56,9 +73,10 @@ const BETA_PAIN_OPTIONS = [
 export async function POST(req: Request) {
   try {
     const clientIp =
-      req.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
-      req.headers.get('x-real-ip') ||
-      '127.0.0.1';
+      req.headers.get('cf-connecting-ip')?.trim() ||
+      req.headers.get('x-real-ip')?.trim() ||
+      req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+      'unknown';
 
     if (!checkRateLimit(clientIp)) {
       return NextResponse.json(
