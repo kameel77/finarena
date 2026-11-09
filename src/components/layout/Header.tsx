@@ -37,6 +37,10 @@ export function Header() {
 
   useEffect(() => setOpen(false), [pathname]);
 
+  if (pathname?.startsWith('/produkty')) {
+    return null;
+  }
+
   return (
     <header
       className={`fixed top-0 inset-x-0 z-50 border-b transition-all duration-300 ${

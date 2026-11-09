@@ -1,5 +1,8 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Linkedin, Mail, MapPin, Phone } from 'lucide-react';
 
 const cols = [
@@ -32,6 +35,11 @@ const cols = [
 ];
 
 export function Footer() {
+  const pathname = usePathname();
+  if (pathname?.startsWith('/produkty')) {
+    return null;
+  }
+
   return (
     <footer className="bg-paper-2 border-t border-hair pt-16 pb-9">
       <div className="wrap">

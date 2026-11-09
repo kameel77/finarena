@@ -61,7 +61,7 @@ export function TestimonialsSection() {
               className="bg-background-secondary p-8 rounded-xl border border-border"
             >
               <Quote className="w-8 h-8 text-primary/30 mb-4" />
-              <p className="text-text-secondary mb-6 italic">"{testimonial.quote}"</p>
+              <p className="text-text-secondary mb-6 italic">&bdquo;{testimonial.quote}&rdquo;</p>
               <div className="flex items-center gap-4">
                 <div className="relative w-12 h-12 rounded-full overflow-hidden">
                   <Image
