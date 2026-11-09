@@ -1020,7 +1020,7 @@ export function MockupM5AccessMatrix() {
  * 12. CRM (M2) — „system pilnuje następnego kroku”:
  * karta szansy przesuwa się do kolejnego etapu → pojawia się okno
  * „Wymagany następny krok” z datą → ten krok pojawia się jako zadanie
- * w „Moja praca”. Pokazuje realną funkcję (KAM-207: następny krok jako zadanie).
+ * w „Moja praca”.
  * ========================================================================= */
 
 const M2_STEPS: StoryStep[] = [
@@ -1036,8 +1036,8 @@ const M2_STEPS: StoryStep[] = [
   },
   {
     id: 'my_work_task',
-    label: '3. Zadanie w »Moja praca« (KAM-207)',
-    narrative: 'Zgodnie z KAM-207 następny krok automatycznie staje się zadaniem w widoku »Moja praca« i kalendarzu handlowca.',
+    label: '3. Zadanie w »Moja praca«',
+    narrative: 'Następny krok automatycznie staje się zaplanowanym zadaniem w widoku »Moja praca« i kalendarzu handlowca.',
   },
 ];
 
@@ -1075,7 +1075,7 @@ export function MockupM2CrmPipeline() {
             CRM · Lejek szans per podmiot + Oś aktywności
           </div>
           <div className="text-[11px] text-slate-400">
-            Firmy i osoby jako osobne obiekty · Wymagany następny krok z datą (KAM-207)
+            Firmy i osoby jako osobne obiekty · Wymagany następny krok z datą
           </div>
         </div>
         <span className="font-mono text-[10px] text-indigo-300">
@@ -1165,12 +1165,12 @@ export function MockupM2CrmPipeline() {
             </div>
           </div>
 
-          {/* Kolumna 3: Moja praca (KAM-207) oraz Oś aktywności */}
+          {/* Kolumna 3: Moja praca oraz Oś aktywności */}
           <div className="rounded-xl bg-[#141C2E] border border-slate-800 p-3 flex flex-col justify-between space-y-3">
             <div className="space-y-2.5">
               <div className="border-b border-slate-800 pb-2 flex items-center justify-between text-xs">
                 <span className="font-semibold text-white">Moja praca · Zadania handlowca</span>
-                <span className="font-mono text-[10px] text-indigo-300">KAM-207</span>
+                <span className="font-mono text-[10px] text-emerald-400">Automatyczny sync</span>
               </div>
 
               {/* Zadanie powstałe automatycznie z następnego kroku */}

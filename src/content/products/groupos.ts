@@ -1,4 +1,4 @@
-import type { ProductConfig } from './types';
+import type { FeatureTraceItem, ProductConfig } from './types';
 
 /**
  * Opcjonalny link do kalendarza rezerwacji rozmowy (Cal.com / Calendly).
@@ -140,7 +140,6 @@ export const grouposProduct: ProductConfig = {
           'Silnik uprawnień (organizacja → podmiot → projekt → rekord) i role systemowe: prezes widzi całą grupę, kierownik spółki widzi wyłącznie przypisane podmioty.',
         ],
         mockupId: 'M1-M5',
-        linearRefs: ['KAM-132', 'KAM-133', 'KAM-134', 'KAM-135', 'KAM-136', 'KAM-117', 'KAM-131'],
       },
       {
         id: 'crm',
@@ -153,7 +152,6 @@ export const grouposProduct: ProductConfig = {
           'Wymagany następny krok z datą oraz widok „Wymaga uwagi” wskazujący szanse bez zaplanowanego działania i relacje bez kontaktu.',
         ],
         mockupId: 'M2',
-        linearRefs: ['KAM-155', 'KAM-156', 'KAM-157', 'KAM-158'],
       },
       {
         id: 'praca',
@@ -166,19 +164,6 @@ export const grouposProduct: ProductConfig = {
           'Widoki: Kanban z przeciąganiem, lista/tabela, kalendarz, „Moja praca”, zapisane widoki, eksport widoku oraz powiadomienia e-mail i push (PWA).',
         ],
         mockupId: 'M3',
-        linearRefs: [
-          'KAM-137',
-          'KAM-138',
-          'KAM-139',
-          'KAM-140',
-          'KAM-141',
-          'KAM-142',
-          'KAM-145',
-          'KAM-146',
-          'KAM-148',
-          'KAM-150',
-          'KAM-153',
-        ],
       },
       {
         id: 'dokumenty',
@@ -191,7 +176,6 @@ export const grouposProduct: ProductConfig = {
           'Rejestr umów z alertami nadchodzących terminów wygasania oraz rejestr ryzyk i obserwacji przypisanych do właścicieli.',
         ],
         mockupId: 'M4',
-        linearRefs: ['KAM-159', 'KAM-160', 'KAM-161', 'KAM-162', 'KAM-121'],
       },
     ],
   },
@@ -205,19 +189,16 @@ export const grouposProduct: ProductConfig = {
         label: 'Zagregowany widok grupy i porównanie spółek',
         detail:
           'Jednym przełącznikiem przechodzisz między zagregowanymi wskaźnikami całej grupy a widokiem pojedynczej spółki lub marki.',
-        linearRef: 'KAM-133 / KAM-163',
       },
       {
         label: 'Alerty umów, ryzyk i zaległości',
         detail:
           'Wygasające umowy, otwarte ryzyka, zadania po terminie i szanse wymagające uwagi w jednym uporządkowanym miejscu.',
-        linearRef: 'KAM-154 / KAM-161 / KAM-162',
       },
       {
         label: 'Wyszukiwanie globalne (Cmd+K) i eksport widoku',
         detail:
           'Błyskawiczne wyszukiwanie po całej grupie z poszanowaniem uprawnień użytkownika oraz zapisane widoki z opcją eksportu widoku.',
-        linearRef: 'KAM-124 / KAM-147 / KAM-149',
       },
     ],
   },
@@ -365,7 +346,6 @@ export const grouposProduct: ProductConfig = {
         description:
           'Uwierzytelnianie dwuskładnikowe (TOTP) dostępne dla każdego konta wraz z bezpieczną polityką haseł, limitami prób logowania i zarządzaniem aktywnymi sesjami.',
         iconName: 'KeyRound',
-        linearRef: 'KAM-126 / KAM-127 / KAM-128',
       },
       {
         id: 'granular-permissions',
@@ -373,7 +353,6 @@ export const grouposProduct: ProductConfig = {
         description:
           'Silnik uprawnień weryfikujący dostęp na poziomie organizacji, podmiotu, projektu i pojedynczego rekordu oraz role systemowe.',
         iconName: 'Shield',
-        linearRef: 'KAM-112 / KAM-117 / KAM-131',
       },
       {
         id: 'confidential-files',
@@ -381,7 +360,6 @@ export const grouposProduct: ProductConfig = {
         description:
           'Możliwość oznaczenia dokumentów klauzulą „Poufne” z kontrolą uprawnień i automatycznym zapisem każdego pobrania pliku.',
         iconName: 'Lock',
-        linearRef: 'KAM-159 / KAM-160',
       },
       {
         id: 'audit-log',
@@ -389,7 +367,6 @@ export const grouposProduct: ProductConfig = {
         description:
           'Historia operacji pokazująca kto, kiedy i jaką zmianę wprowadził w rekordach, uprawnieniach oraz dokumentach.',
         iconName: 'History',
-        linearRef: 'KAM-129',
       },
       {
         id: 'trash-restore',
@@ -397,7 +374,6 @@ export const grouposProduct: ProductConfig = {
         description:
           'Ochrona przed przypadkowym usunięciem danych — usunięte rekordy trafiają do kosza z możliwością kontrolowanego przywrócenia.',
         iconName: 'FileSpreadsheet',
-        linearRef: 'KAM-130',
       },
       {
         id: 'sha256-checksum',
@@ -405,7 +381,6 @@ export const grouposProduct: ProductConfig = {
         description:
           'Każdy wgrany plik otrzymuje kryptograficzną sumę kontrolną SHA-256 potwierdzającą jego integralność.',
         iconName: 'HardDrive',
-        linearRef: 'KAM-121',
       },
       {
         id: 'daily-backup-restore',
@@ -413,7 +388,6 @@ export const grouposProduct: ProductConfig = {
         description:
           'Regularne kopie zapasowe bazy danych i plików weryfikowane automatycznym testem odtworzenia środowiska.',
         iconName: 'DatabaseBackup',
-        linearRef: 'KAM-120',
       },
     ],
     rodoBlock: {
@@ -577,96 +551,112 @@ export const grouposProduct: ProductConfig = {
     ctaLabel: 'Umów demo',
     ctaHref: '#formularz',
   },
-  traceability: [
-    {
-      feature:
-        'Podmioty (spółki/JDG) i jednostki operacyjne (marki, partnerstwa), hierarchia i widok grupy, zespoły, zaproszenia i onboarding, branding organizacji',
-      linearIssues: ['KAM-132', 'KAM-133', 'KAM-134', 'KAM-135', 'KAM-136'],
-      status: 'Done',
-      sectionRef: '7.1 Hero (M1), 7.4 Krok 1 (M1, M5), 7.6 Dla kogo',
-    },
-    {
-      feature:
-        'CRM: firmy i osoby jako osobne obiekty (osoba w wielu firmach), szanse w lejkach per podmiot, oś aktywności z szybkim logowaniem rozmowy, wymagany następny krok, widok „Wymaga uwagi” i relacje bez kontaktu',
-      linearIssues: ['KAM-155', 'KAM-156', 'KAM-157', 'KAM-158'],
-      status: 'Done',
-      sectionRef: '7.4 Krok 2 (M2)',
-    },
-    {
-      feature:
-        'Praca: projekty → etapy → zadania → podzadania → checklisty, konfigurowalne statusy, wielu wykonawców i obserwatorzy, daty, szacunek, priorytety, tagi, zadania cykliczne, operacje masowe, archiwizacja, powiązanie z firmą/osobą/szansą',
-      linearIssues: [
-        'KAM-137',
-        'KAM-138',
-        'KAM-139',
-        'KAM-140',
-        'KAM-141',
-        'KAM-142',
-        'KAM-143',
-        'KAM-144',
-      ],
-      status: 'Done',
-      sectionRef: '7.4 Krok 3 (M3)',
-    },
-    {
-      feature:
-        'Widoki: lista/tabela, Kanban z przeciąganiem, kalendarz, „Moja praca”, zapisane widoki, eksport widoku, pulpit zarządu',
-      linearIssues: [
-        'KAM-145',
-        'KAM-146',
-        'KAM-147',
-        'KAM-148',
-        'KAM-149',
-        'KAM-163',
-      ],
-      status: 'Done',
-      sectionRef: '7.1 Hero (M1), 7.4 Krok 3 (M3), 7.5 Pulpit zarządu (M1)',
-    },
-    {
-      feature:
-        'Współpraca: komentarze z @wzmiankami, oś „Historia i aktywność”, centrum powiadomień, e-mail i push (PWA) z preferencjami, przypomnienia i raport zaległości',
-      linearIssues: ['KAM-150', 'KAM-151', 'KAM-152', 'KAM-153', 'KAM-154'],
-      status: 'Done',
-      sectionRef: '7.4 Krok 3 (M3), 7.5 Pulpit zarządu, 7.11 FAQ',
-    },
-    {
-      feature:
-        'Dokumenty i umowy: repozytorium z folderami (podmiot, projekt, rekord CRM), uprawnienia i klasyfikacja „poufne”, rejestr umów z alertami terminów, rejestr ryzyk i obserwacji',
-      linearIssues: ['KAM-159', 'KAM-160', 'KAM-161', 'KAM-162'],
-      status: 'Done',
-      sectionRef: '7.4 Krok 4 (M4), 7.5 Pulpit zarządu, 7.7 Bezpieczeństwo',
-    },
-    {
-      feature:
-        'Bezpieczeństwo: MFA (TOTP) dla wszystkich, bezpieczne hasła i limity prób logowania, zarządzanie sesjami, silnik uprawnień (organizacja → podmiot → projekt → rekord), role systemowe, pełny dziennik audytu ze zmianami, kosz i przywracanie, pliki z sumą kontrolną SHA-256, codzienny backup z automatycznym testem odtworzenia',
-      linearIssues: [
-        'KAM-112',
-        'KAM-117',
-        'KAM-120',
-        'KAM-121',
-        'KAM-126',
-        'KAM-127',
-        'KAM-128',
-        'KAM-129',
-        'KAM-130',
-        'KAM-131',
-      ],
-      status: 'Done',
-      sectionRef: '7.1 Hero, 7.4 Krok 1 (M5), 7.7 Bezpieczeństwo (M6)',
-    },
-    {
-      feature:
-        'Platforma: jeden kod w trybie SaaS i w trybie dedykowanym, wyszukiwanie globalne z uprawnieniami (Cmd+K), PL/EN, strefy czasowe i waluty, API v1',
-      linearIssues: ['KAM-113', 'KAM-116', 'KAM-123', 'KAM-124'],
-      status: 'Done',
-      sectionRef: '7.5 Pulpit zarządu, 7.7 Bezpieczeństwo, 7.8 Modele współpracy, 7.11 FAQ',
-    },
-    {
-      feature:
-        'W trakcie (In Review, opisane bez podawania dat): PWA na iPhonie i tablecie oraz pakiet instalacji dedykowanej',
-      linearIssues: ['KAM-164', 'KAM-122'],
-      status: 'In Review',
-      sectionRef: '7.4 Krok 3 (M3), 7.7 Bezpieczeństwo, 7.8 Modele współpracy, 7.11 FAQ',
-    },
+  featureList: [
+    'Podmioty (spółki/JDG) i jednostki operacyjne (marki, partnerstwa), hierarchia i widok grupy, zespoły, zaproszenia i onboarding, branding organizacji',
+    'CRM: firmy i osoby jako osobne obiekty (osoba w wielu firmach), szanse w lejkach per podmiot, oś aktywności z szybkim logowaniem rozmowy, wymagany następny krok, widok „Wymaga uwagi” i relacje bez kontaktu',
+    'Praca: projekty → etapy → zadania → podzadania → checklisty, konfigurowalne statusy, wielu wykonawców i obserwatorzy, daty, szacunek, priorytety, tagi, zadania cykliczne, operacje masowe, archiwizacja, powiązanie z firmą/osobą/szansą',
+    'Widoki: lista/tabela, Kanban z przeciąganiem, kalendarz, „Moja praca”, zapisane widoki, eksport widoku, pulpit zarządu',
+    'Współpraca: komentarze z @wzmiankami, oś „Historia i aktywność”, centrum powiadomień, e-mail i push (PWA) z preferencjami, przypomnienia i raport zaległości',
+    'Dokumenty i umowy: repozytorium z folderami (podmiot, projekt, rekord CRM), uprawnienia i klasyfikacja „poufne”, rejestr umów z alertami terminów, rejestr ryzyk i obserwacji',
+    'Bezpieczeństwo: MFA (TOTP) dla wszystkich, bezpieczne hasła i limity prób logowania, zarządzanie sesjami, silnik uprawnień (organizacja → podmiot → projekt → rekord), role systemowe, pełny dziennik audytu ze zmianami, kosz i przywracanie, pliki z sumą kontrolną SHA-256, codzienny backup z automatycznym testem odtworzenia',
+    'Platforma: jeden kod w trybie SaaS i w trybie dedykowanym, wyszukiwanie globalne z uprawnieniami (Cmd+K), PL/EN, strefy czasowe i waluty, API v1',
   ],
 };
+
+/**
+ * Tabela spójności funkcji z Linear Backlog (KAM-208 / BRIEF-AGY-PRODUCT-PAGE.md sekcja 3).
+ * Wyodrębniona poza obiekt `grouposProduct`, aby wewnętrzne identyfikatory zgłoszeń
+ * nie trafiały do publicznego payloadu HTML/RSC. Wykorzystywana do audytu i weryfikacji.
+ */
+export const GROUPOS_FEATURE_AUDIT_TABLE: FeatureTraceItem[] = [
+  {
+    feature:
+      'Podmioty (spółki/JDG) i jednostki operacyjne (marki, partnerstwa), hierarchia i widok grupy, zespoły, zaproszenia i onboarding, branding organizacji',
+    linearIssues: ['KAM-132', 'KAM-133', 'KAM-134', 'KAM-135', 'KAM-136'],
+    status: 'Done',
+    sectionRef: '7.1 Hero (M1), 7.4 Krok 1 (M1, M5), 7.6 Dla kogo',
+  },
+  {
+    feature:
+      'CRM: firmy i osoby jako osobne obiekty (osoba w wielu firmach), szanse w lejkach per podmiot, oś aktywności z szybkim logowaniem rozmowy, wymagany następny krok, widok „Wymaga uwagi” i relacje bez kontaktu',
+    linearIssues: ['KAM-155', 'KAM-156', 'KAM-157', 'KAM-158'],
+    status: 'Done',
+    sectionRef: '7.4 Krok 2 (M2)',
+  },
+  {
+    feature:
+      'Praca: projekty → etapy → zadania → podzadania → checklisty, konfigurowalne statusy, wielu wykonawców i obserwatorzy, daty, szacunek, priorytety, tagi, zadania cykliczne, operacje masowe, archiwizacja, powiązanie z firmą/osobą/szansą',
+    linearIssues: [
+      'KAM-137',
+      'KAM-138',
+      'KAM-139',
+      'KAM-140',
+      'KAM-141',
+      'KAM-142',
+      'KAM-143',
+      'KAM-144',
+    ],
+    status: 'Done',
+    sectionRef: '7.4 Krok 3 (M3)',
+  },
+  {
+    feature:
+      'Widoki: lista/tabela, Kanban z przeciąganiem, kalendarz, „Moja praca”, zapisane widoki, eksport widoku, pulpit zarządu',
+    linearIssues: [
+      'KAM-145',
+      'KAM-146',
+      'KAM-147',
+      'KAM-148',
+      'KAM-149',
+      'KAM-163',
+    ],
+    status: 'Done',
+    sectionRef: '7.1 Hero (M1), 7.4 Krok 3 (M3), 7.5 Pulpit zarządu (M1)',
+  },
+  {
+    feature:
+      'Współpraca: komentarze z @wzmiankami, oś „Historia i aktywność”, centrum powiadomień, e-mail i push (PWA) z preferencjami, przypomnienia i raport zaległości',
+    linearIssues: ['KAM-150', 'KAM-151', 'KAM-152', 'KAM-153', 'KAM-154'],
+    status: 'Done',
+    sectionRef: '7.4 Krok 3 (M3), 7.5 Pulpit zarządu, 7.11 FAQ',
+  },
+  {
+    feature:
+      'Dokumenty i umowy: repozytorium z folderami (podmiot, projekt, rekord CRM), uprawnienia i klasyfikacja „poufne”, rejestr umów z alertami terminów, rejestr ryzyk i obserwacji',
+    linearIssues: ['KAM-159', 'KAM-160', 'KAM-161', 'KAM-162'],
+    status: 'Done',
+    sectionRef: '7.4 Krok 4 (M4), 7.5 Pulpit zarządu, 7.7 Bezpieczeństwo',
+  },
+  {
+    feature:
+      'Bezpieczeństwo: MFA (TOTP) dla wszystkich, bezpieczne hasła i limity prób logowania, zarządzanie sesjami, silnik uprawnień (organizacja → podmiot → projekt → rekord), role systemowe, pełny dziennik audytu ze zmianami, kosz i przywracanie, pliki z sumą kontrolną SHA-256, codzienny backup z automatycznym testem odtworzenia',
+    linearIssues: [
+      'KAM-112',
+      'KAM-117',
+      'KAM-120',
+      'KAM-121',
+      'KAM-126',
+      'KAM-127',
+      'KAM-128',
+      'KAM-129',
+      'KAM-130',
+      'KAM-131',
+    ],
+    status: 'Done',
+    sectionRef: '7.1 Hero, 7.4 Krok 1 (M5), 7.7 Bezpieczeństwo (M6)',
+  },
+  {
+    feature:
+      'Platforma: jeden kod w trybie SaaS i w trybie dedykowanym, wyszukiwanie globalne z uprawnieniami (Cmd+K), PL/EN, strefy czasowe i waluty, API v1',
+    linearIssues: ['KAM-113', 'KAM-116', 'KAM-123', 'KAM-124'],
+    status: 'Done',
+    sectionRef: '7.5 Pulpit zarządu, 7.7 Bezpieczeństwo, 7.8 Modele współpracy, 7.11 FAQ',
+  },
+  {
+    feature:
+      'W trakcie (In Review, opisane bez podawania dat): PWA na iPhonie i tablecie oraz pakiet instalacji dedykowanej',
+    linearIssues: ['KAM-164', 'KAM-122'],
+    status: 'In Review',
+    sectionRef: '7.4 Krok 3 (M3), 7.7 Bezpieczeństwo, 7.8 Modele współpracy, 7.11 FAQ',
+  },
+];

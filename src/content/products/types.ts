@@ -82,7 +82,7 @@ export interface ProductHowItWorksStep {
   title: string;
   bullets: string[];
   mockupId: 'M1-M5' | 'M2' | 'M3' | 'M4';
-  linearRefs: string[];
+  linearRefs?: string[];
 }
 
 export interface ProductIndustryCard {
@@ -112,7 +112,7 @@ export interface ProductSecurityFeature {
     | 'DatabaseBackup'
     | 'HardDrive'
     | 'KeyRound';
-  linearRef: string;
+  linearRef?: string;
 }
 
 export interface ProductCooperationModel {
@@ -175,7 +175,7 @@ export interface ProductConfig {
     eyebrow: string;
     h2: string;
     description: string;
-    highlights: { label: string; detail: string; linearRef: string }[];
+    highlights: { label: string; detail: string; linearRef?: string }[];
   };
   forWhom: {
     eyebrow: string;
@@ -259,5 +259,6 @@ export interface ProductConfig {
     ctaLabel: string;
     ctaHref: string;
   };
-  traceability: FeatureTraceItem[];
+  featureList?: string[];
+  traceability?: FeatureTraceItem[];
 }

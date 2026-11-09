@@ -105,7 +105,10 @@ export default function ProductPage({
       name: 'Finarena Sp. z o.o.',
       url: SITE_URL,
     },
-    featureList: product.traceability.map((t) => t.feature),
+    featureList:
+      product.featureList ??
+      product.traceability?.map((t) => t.feature) ??
+      product.howItWorks.steps.map((s) => s.title),
   };
 
   const faqJsonLd = {
