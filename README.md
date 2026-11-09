@@ -193,3 +193,17 @@ W Coolify:
 - [ ] Dodać treści (blog, case studies)
 - [ ] Skonfigurować SSL
 - [ ] Przetestować formularz kontaktowy
+
+## 🧩 Szablon stron produktów (`/produkty/[slug]`)
+
+Strony produktów w katalogu `/produkty/*` korzystają z odizolowanego układu (`src/app/(products)/produkty/[slug]/layout.tsx`) i własnego zestawu zmiennych CSS (`--brand-*`), bez wpływu na globalne style `finarena.pl`.
+
+### Jak dodać nowy produkt (1 plik konfiguracji):
+
+1. Utwórz plik `src/content/products/<slug>.ts` zgodny z typem `ProductConfig` (`src/content/products/types.ts`). Wzorzec produkcyjny: `src/content/products/groupos.ts`, wzorzec testowy (`noindex`): `src/content/products/sample-product.ts`.
+2. Zarejestruj obiekt w `PRODUCTS_BY_SLUG` w `src/content/products/index.ts`.
+3. Automatycznie generowane są:
+   - strona `/produkty/<slug>` z własnym nagłówkiem, stopką, makietami, formularzem i zmiennymi CSS `--brand-*`,
+   - obraz Open Graph 1200×630 (`/produkty/<slug>/opengraph-image`),
+   - metadane SEO oraz dane strukturalne `SoftwareApplication` + `FAQPage`,
+   - wpis w `sitemap.xml` (dla produktów z `noindex !== true`) oraz karta w katalogu `/produkty`.

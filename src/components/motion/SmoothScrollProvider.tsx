@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { ReactLenis, useLenis } from 'lenis/react';
 import 'lenis/dist/lenis.css';
 import gsap from 'gsap';
@@ -22,6 +23,7 @@ interface SmoothScrollProviderProps {
 }
 
 export function SmoothScrollProvider({ children }: SmoothScrollProviderProps) {
+  const pathname = usePathname();
   const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
@@ -33,7 +35,7 @@ export function SmoothScrollProvider({ children }: SmoothScrollProviderProps) {
     return () => mq.removeEventListener?.('change', onChange);
   }, []);
 
-  if (reducedMotion) {
+  if (reducedMotion || pathname?.startsWith('/produkty')) {
     return <>{children}</>;
   }
 
