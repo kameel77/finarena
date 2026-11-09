@@ -32,4 +32,8 @@ export const sampleSubcontractorProduct: ProductConfig = {
     ogTitle: 'FieldOps — Szablon produktu Finarena',
     ogSubtitle: 'Weryfikacja szablonu wieloproduktowego z niezależnym motywem CSS.',
   },
+  references: {
+    heading: 'Program pilotażowy:',
+    items: [],
+  },
 };

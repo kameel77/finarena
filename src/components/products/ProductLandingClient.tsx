@@ -102,24 +102,6 @@ function SecurityFeatureIcon({ name }: { name: ProductSecurityFeature['iconName'
   }
 }
 
-function EastGateLogo() {
-  return (
-    <div
-      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#141C2E] border border-slate-700/80 hover:border-slate-600 transition-colors"
-      aria-label="East Gate Group"
-    >
-      <Image
-        src="/products/groupos/egg-wordmark.svg"
-        alt="East Gate Group"
-        width={140}
-        height={22}
-        className="h-5 sm:h-5.5 w-auto object-contain"
-        priority
-      />
-    </div>
-  );
-}
-
 export function ProductLandingClient({
   product,
   initialVariantParam,
@@ -416,7 +398,26 @@ export function ProductLandingClient({
             <span className="font-mono text-xs uppercase tracking-wider text-slate-400">
               {product.references.heading}
             </span>
-            <EastGateLogo />
+            {product.references.items.map((ref) => (
+              <div
+                key={ref.name}
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#141C2E] border border-slate-700/80 hover:border-slate-600 transition-colors"
+                aria-label={ref.name}
+              >
+                {ref.logoPath ? (
+                  <Image
+                    src={ref.logoPath}
+                    alt={ref.name}
+                    width={140}
+                    height={22}
+                    className="h-5 sm:h-5.5 w-auto object-contain"
+                    priority
+                  />
+                ) : (
+                  <span className="font-semibold text-xs text-white">{ref.name}</span>
+                )}
+              </div>
+            ))}
           </div>
           <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 font-mono text-[11px] sm:text-xs text-slate-300">
             <span className="inline-flex items-center gap-1.5">

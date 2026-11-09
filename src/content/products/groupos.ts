@@ -504,8 +504,12 @@ export const grouposProduct: ProductConfig = {
     thankYou: {
       title: 'Dziękujemy za zgłoszenie.',
       message:
-        'Twoja wiadomość trafiła do zespołu Finarena. Odezwiemy się, aby omówić strukturę Twojej grupy — możesz też od razu wybrać termin rozmowy w kalendarzu:',
+        'Twoja wiadomość trafiła do zespołu Finarena. Odezwiemy się, aby omówić strukturę Twojej grupy.',
+      bookingPrompt:
+        'Możesz też od razu wybrać dogodny termin rozmowy w kalendarzu:',
       bookingCtaLabel: 'Wybierz termin rozmowy',
+      betaMessage:
+        'Dziękujemy za zgłoszenie do programu pilotażowego dla podwykonawców. Skontaktujemy się z Tobą, aby omówić specyfikę Twojej branży i ustalić termin wdrożenia testowego.',
     },
   },
   faq: {

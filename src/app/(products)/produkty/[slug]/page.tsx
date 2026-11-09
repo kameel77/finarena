@@ -6,7 +6,8 @@ import { ProductLandingClient } from '@/components/products/ProductLandingClient
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://finarena.pl';
 
 export function generateStaticParams() {
-  return getAllProducts({ includeNoindex: true }).map((p) => ({
+  const isProd = process.env.NODE_ENV === 'production';
+  return getAllProducts({ includeNoindex: !isProd }).map((p) => ({
     slug: p.slug,
   }));
 }
@@ -16,8 +17,9 @@ export function generateMetadata({
 }: {
   params: { slug: string };
 }): Metadata {
+  const isProd = process.env.NODE_ENV === 'production';
   const product = getProductBySlug(params.slug);
-  if (!product) {
+  if (!product || (product.noindex && isProd)) {
     return {
       title: 'Produkt nie znaleziony | Finarena',
     };
@@ -83,8 +85,9 @@ export default function ProductPage({
   params: { slug: string };
   searchParams?: { v?: string };
 }) {
+  const isProd = process.env.NODE_ENV === 'production';
   const product = getProductBySlug(params.slug);
-  if (!product) {
+  if (!product || (product.noindex && isProd)) {
     notFound();
   }
 

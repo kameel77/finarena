@@ -204,30 +204,39 @@ export function ProductLeadForm({
             {product.formSection.thankYou.title}
           </h3>
           <p className="text-sm sm:text-base text-slate-700 max-w-2xl leading-relaxed">
-            {product.formSection.thankYou.message}
+            {activeFormTab === 'beta' && product.formSection.thankYou.betaMessage
+              ? product.formSection.thankYou.betaMessage
+              : product.formSection.thankYou.message}
           </p>
         </div>
 
-        {product.demoBookingUrl ? (
-          <div className="flex flex-wrap items-center gap-4 pt-2">
-            <a
-              href={product.demoBookingUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-[#2E4AE6] hover:bg-[#1E38C8] text-white text-sm font-semibold shadow-md transition-colors"
-            >
-              <Calendar className="w-4 h-4" />
-              <span>{product.formSection.thankYou.bookingCtaLabel}</span>
-              <ArrowRight className="w-4 h-4" />
-            </a>
+        {product.demoBookingUrl && activeFormTab === 'demo' ? (
+          <div className="space-y-3 pt-2">
+            {product.formSection.thankYou.bookingPrompt && (
+              <p className="text-sm text-slate-600 font-medium">
+                {product.formSection.thankYou.bookingPrompt}
+              </p>
+            )}
+            <div className="flex flex-wrap items-center gap-4">
+              <a
+                href={product.demoBookingUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-[#2E4AE6] hover:bg-[#1E38C8] text-white text-sm font-semibold shadow-md transition-colors"
+              >
+                <Calendar className="w-4 h-4" />
+                <span>{product.formSection.thankYou.bookingCtaLabel}</span>
+                <ArrowRight className="w-4 h-4" />
+              </a>
 
-            <button
-              type="button"
-              onClick={() => setStatus('idle')}
-              className="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs font-medium transition-colors"
-            >
-              Wyślij kolejne zgłoszenie
-            </button>
+              <button
+                type="button"
+                onClick={() => setStatus('idle')}
+                className="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs font-medium transition-colors"
+              >
+                Wyślij kolejne zgłoszenie
+              </button>
+            </div>
           </div>
         ) : (
           <div className="pt-2">

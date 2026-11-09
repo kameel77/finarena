@@ -245,7 +245,9 @@ export interface ProductConfig {
     thankYou: {
       title: string;
       message: string;
+      bookingPrompt?: string;
       bookingCtaLabel: string;
+      betaMessage?: string;
     };
   };
   faq: {

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
+import { getProductBySlug } from '@/content/products';
 
 function escapeHtml(input: string): string {
   return input
@@ -11,6 +12,24 @@ function escapeHtml(input: string): string {
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const PHONE_RE = /^[0-9 +()\-]{0,40}$/;
+
+const ipSubmissionTimestamps = new Map<string, number[]>();
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minut
+const RATE_LIMIT_MAX_SUBMISSIONS = 5;
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const timestamps = ipSubmissionTimestamps.get(ip) || [];
+  const validTimestamps = timestamps.filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
+  if (validTimestamps.length >= RATE_LIMIT_MAX_SUBMISSIONS) {
+    ipSubmissionTimestamps.set(ip, validTimestamps);
+    return false;
+  }
+  validTimestamps.push(now);
+  ipSubmissionTimestamps.set(ip, validTimestamps);
+  return true;
+}
 
 const DEMO_ENTITIES_OPTIONS = ['1', '2–3', '4–10', '10+'] as const;
 const DEMO_USERS_OPTIONS = ['do 10', '11–50', '51–200', '200+'] as const;
@@ -36,6 +55,22 @@ const BETA_PAIN_OPTIONS = [
 
 export async function POST(req: Request) {
   try {
+    const clientIp =
+      req.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
+      req.headers.get('x-real-ip') ||
+      '127.0.0.1';
+
+    if (!checkRateLimit(clientIp)) {
+      return NextResponse.json(
+        {
+          ok: false,
+          message:
+            'Zbyt wiele zgłoszeń z Twojego adresu IP. Odczekaj chwilę przed kolejną próbą.',
+        },
+        { status: 429 }
+      );
+    }
+
     const body = await req.json().catch(() => null);
     if (!body || typeof body !== 'object') {
       return NextResponse.json(
@@ -52,6 +87,15 @@ export async function POST(req: Request) {
 
     // 2. Common fields validation
     const productSlug = String(body.productSlug || 'groupos').trim();
+    const product = getProductBySlug(productSlug);
+    const isProd = process.env.NODE_ENV === 'production';
+    if (!product || (product.noindex && isProd)) {
+      return NextResponse.json(
+        { ok: false, message: 'Nieznany lub niedostępny produkt.' },
+        { status: 400 }
+      );
+    }
+
     const formType = body.formType === 'beta' ? 'beta' : body.formType === 'demo' ? 'demo' : null;
     const h1Variant = body.h1Variant === 'b' ? 'b' : 'a';
 
@@ -59,7 +103,13 @@ export async function POST(req: Request) {
     const email = String(body.email || '').trim();
     const phone = String(body.phone || '').trim();
     const company = String(body.company || '').trim();
-    const rodoConsent = Boolean(body.rodoConsent);
+
+    if (body.rodoConsent !== true) {
+      return NextResponse.json(
+        { ok: false, message: 'Wymagana jest zgoda na przetwarzanie danych osobowych (RODO).' },
+        { status: 400 }
+      );
+    }
 
     if (!formType) {
       return NextResponse.json(
@@ -82,16 +132,20 @@ export async function POST(req: Request) {
       );
     }
 
-    if (company.length < 2 || company.length > 160) {
+    if (phone.length > 40 || (phone.length > 0 && !PHONE_RE.test(phone))) {
       return NextResponse.json(
-        { ok: false, message: 'Podaj nazwę firmy lub grupy spółek.' },
+        {
+          ok: false,
+          message:
+            'Nieprawidłowy format numeru telefonu (maks. 40 znaków, dozwolone cyfry, spacje i znaki + - ()).',
+        },
         { status: 400 }
       );
     }
 
-    if (!rodoConsent) {
+    if (company.length < 2 || company.length > 160) {
       return NextResponse.json(
-        { ok: false, message: 'Wymagana jest zgoda na przetwarzanie danych osobowych (RODO).' },
+        { ok: false, message: 'Podaj nazwę firmy lub grupy spółek.' },
         { status: 400 }
       );
     }
@@ -200,7 +254,9 @@ export async function POST(req: Request) {
       </ul>
     `;
 
-    const isDryRunHeader = req.headers.get('x-test-dry-run') === '1';
+    const isDryRunEnabled =
+      process.env.LEAD_DRY_RUN_ENABLED === '1' || process.env.NODE_ENV === 'development';
+    const isDryRunHeader = isDryRunEnabled && req.headers.get('x-test-dry-run') === '1';
     const hasSmtpCredentials = Boolean(process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD);
 
     if (isDryRunHeader) {
@@ -218,12 +274,9 @@ export async function POST(req: Request) {
 
     if (!hasSmtpCredentials) {
       console.error(
-        '[products/lead] Błąd krytyczny: brak konfiguracji SMTP (GMAIL_USER / GMAIL_APP_PASSWORD). Formularz nie może wysłać leada:',
+        '[products/lead] Błąd: brak konfiguracji SMTP (GMAIL_USER / GMAIL_APP_PASSWORD). Formularz nie może wysłać leada:',
         {
-          subjectPrefix,
-          name,
-          email,
-          company,
+          productSlug,
           formType,
           h1Variant,
         }

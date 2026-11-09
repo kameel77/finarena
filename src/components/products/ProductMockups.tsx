@@ -44,12 +44,21 @@ export function useStoryLoop({
   defaultReducedStep?: number;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [step, setStep] = useState<number>(defaultReducedStep);
+  const [step, setStep] = useState<number>(0);
   const [inView, setInView] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [progress, setProgress] = useState(0); // 0 to 100
   const resumeTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      if (resumeTimerRef.current) {
+        clearTimeout(resumeTimerRef.current);
+      }
+    };
+  }, []);
 
   // prefers-reduced-motion
   useEffect(() => {
@@ -91,16 +100,17 @@ export function useStoryLoop({
     if (reducedMotion || !inView || isPaused) return;
 
     const intervalMs = 50;
-    const increment = (intervalMs / stepDurationMs) * 100;
+    let accumulatedMs = 0;
 
     const timer = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          setStep((cur) => (cur + 1) % steps.length);
-          return 0;
-        }
-        return prev + increment;
-      });
+      accumulatedMs += intervalMs;
+      if (accumulatedMs >= stepDurationMs) {
+        accumulatedMs = 0;
+        setProgress(0);
+        setStep((cur) => (cur + 1) % steps.length);
+      } else {
+        setProgress((accumulatedMs / stepDurationMs) * 100);
+      }
     }, intervalMs);
 
     return () => clearInterval(timer);
@@ -1037,7 +1047,7 @@ const M2_STEPS: StoryStep[] = [
   {
     id: 'my_work_task',
     label: '3. Zadanie w »Moja praca«',
-    narrative: 'Następny krok automatycznie staje się zaplanowanym zadaniem w widoku »Moja praca« i kalendarzu handlowca.',
+    narrative: 'Następny krok automatycznie staje się zaplanowanym zadaniem w widoku »Moja praca«, powiązanym z szansą.',
   },
 ];
 
@@ -1170,7 +1180,7 @@ export function MockupM2CrmPipeline() {
             <div className="space-y-2.5">
               <div className="border-b border-slate-800 pb-2 flex items-center justify-between text-xs">
                 <span className="font-semibold text-white">Moja praca · Zadania handlowca</span>
-                <span className="font-mono text-[10px] text-emerald-400">Automatyczny sync</span>
+                <span className="font-mono text-[10px] text-emerald-400">Powiązane z szansą</span>
               </div>
 
               {/* Zadanie powstałe automatycznie z następnego kroku */}
@@ -1191,7 +1201,7 @@ export function MockupM2CrmPipeline() {
                 </div>
               ) : (
                 <div className="rounded-lg p-2.5 bg-[#101726] border border-slate-800 text-[11px] text-slate-400">
-                  Przesuń szansę, aby wygenerować zadanie w widoku handlowca...
+                  Przesuń szansę, aby wygenerować zadanie w »Moja praca«...
                 </div>
               )}
 

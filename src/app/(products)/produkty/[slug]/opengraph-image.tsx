@@ -21,15 +21,19 @@ export default async function ProductOpenGraphImage({
 }: {
   params: { slug: string };
 }) {
+  const isProd = process.env.NODE_ENV === 'production';
   const product = getProductBySlug(params.slug);
-  const name = product?.name || 'GroupOS';
+  if (!product || (product.noindex && isProd)) {
+    return new Response('Not Found', { status: 404 });
+  }
+  const name = product.name;
   const title =
-    product?.seo.ogTitle || 'Cała grupa firm. Jeden system. Każda spółka z osobnymi danymi.';
+    product.seo.ogTitle || 'Cała grupa firm. Jeden system. Każda spółka z osobnymi danymi.';
   const subtitle =
-    product?.seo.ogSubtitle ||
+    product.seo.ogSubtitle ||
     'Relacje z klientami, projekty, zadania, dokumenty i umowy wszystkich spółek w jednym miejscu. W chmurze w UE albo na Twoim własnym serwerze.';
-  const bgDark = product?.theme.bgDark || '#0B0F17';
-  const accent = product?.theme.accent || '#4F6BFF';
+  const bgDark = product.theme.bgDark || '#0B0F17';
+  const accent = product.theme.accent || '#4F6BFF';
 
   return new ImageResponse(
     (
